@@ -30,10 +30,11 @@
 - [ ] Get Player Advanced Stats
 
 ### Standings
-- [ ] League Standings
-- [ ] Conference Standings
-- [ ] Division Standings
-- [ ] Wild Card Standings
+- [x] League Standings
+- [x] Conference Standings
+- [x] Division Standings
+- [x] Wild Card Standings
+- [ ] Add playoff indicators to standings
 - [ ] Playoff Picture/Race
 
 ### League Information

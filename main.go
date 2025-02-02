@@ -19,8 +19,11 @@ func main() {
 	exampleGoalieSearch := false
 	exampleSeasonStats := false
 	exampleTeamSchedule := false
-	exampleCurrentStandings := true
+	exampleCurrentStandings := false
 	exampleStandingsByDate := false
+	exampleLeagueStandings := true     // Show overall NHL standings
+	exampleConferenceStandings := true // Show standings by conference
+	exampleDivisionStandings := true   // Show standings by division
 
 	// Track if any example was run
 	examplesRun := false
@@ -95,6 +98,27 @@ func main() {
 		}
 	}
 
+	if exampleLeagueStandings {
+		examplesRun = true
+		if err := examples.GetLeagueStandings(client); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if exampleConferenceStandings {
+		examplesRun = true
+		if err := examples.GetConferenceStandings(client); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if exampleDivisionStandings {
+		examplesRun = true
+		if err := examples.GetDivisionStandings(client); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if !examplesRun {
 		fmt.Println("Available examples (set the corresponding flag to true to run):")
 		fmt.Println("- exampleGetCurrentSchedule: Get today's NHL schedule")
@@ -107,5 +131,8 @@ func main() {
 		fmt.Println("- exampleTeamSchedule: Get a team's full schedule")
 		fmt.Println("- exampleCurrentStandings: Get current NHL standings")
 		fmt.Println("- exampleStandingsByDate: Get NHL standings for a specific date")
+		fmt.Println("- exampleLeagueStandings: Get overall NHL standings")
+		fmt.Println("- exampleConferenceStandings: Get standings by conference")
+		fmt.Println("- exampleDivisionStandings: Get standings by division")
 	}
 }
