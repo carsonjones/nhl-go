@@ -77,7 +77,7 @@ func (c *Client) GetScheduleByDate(date string, sortOrder ...GameSort) (*Filtere
 	sort.Slice(filteredGames, func(i, j int) bool {
 		timeI, errI := time.Parse(time.RFC3339, filteredGames[i].StartTimeUTC)
 		timeJ, errJ := time.Parse(time.RFC3339, filteredGames[j].StartTimeUTC)
-		
+
 		// If we can't parse either time, maintain original order
 		if errI != nil || errJ != nil {
 			return i < j
@@ -331,7 +331,7 @@ func (c *Client) GetPlayerStats(playerID int, isGoalie bool, reportType string, 
 
 	// First get the generic response
 	var genericResp StatsResponse
-	url := fmt.Sprintf("https://api.nhle.com/stats/rest/en/%s/%s?cayenneExp=%s", 
+	url := fmt.Sprintf("https://api.nhle.com/stats/rest/en/%s/%s?cayenneExp=%s",
 		playerType, reportType, url.QueryEscape(cayenneExp))
 	err := c.get(url, &genericResp)
 	if err != nil {
@@ -404,4 +404,29 @@ func (c *Client) GetFilteredPlayerStats(playerID int, filter *StatsFilter) ([]Se
 	})
 
 	return filtered, nil
+}
+
+// GetTeamSchedule retrieves a team's schedule for a given season
+func (c *Client) GetTeamSchedule(team *TeamInfo, seasonID int) (*TeamScheduleResponse, error) {
+	if team == nil {
+		return nil, fmt.Errorf("team cannot be nil")
+	}
+
+	url := fmt.Sprintf("%s/club-schedule-season/%s/%d", c.baseURL, team.Abbreviation, seasonID)
+	resp, err := c.httpClient.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get schedule for %s: %w", team.Name.Default, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get schedule for %s: %s", team.Name.Default, resp.Status)
+	}
+
+	var schedule TeamScheduleResponse
+	if err := json.NewDecoder(resp.Body).Decode(&schedule); err != nil {
+		return nil, fmt.Errorf("failed to decode schedule response: %w", err)
+	}
+
+	return &schedule, nil
 }

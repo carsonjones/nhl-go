@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-nhl/nhl"
+	"log"
 	"sort"
 	"strings"
 	"time"
@@ -32,7 +33,7 @@ func formatGameTime(utcTime string) (string, error) {
 	cstTime := t.In(cst)
 
 	// Format the times
-	return fmt.Sprintf("%s EST (%s CST)", 
+	return fmt.Sprintf("%s EST (%s CST)",
 		estTime.Format("3:04 PM"),
 		cstTime.Format("3:04 PM")), nil
 }
@@ -46,18 +47,18 @@ func displayGames(games *nhl.FilteredScoreboardResponse) {
 			continue
 		}
 
-		fmt.Printf("%s at %s - %s\n", 
+		fmt.Printf("%s at %s - %s\n",
 			game.AwayTeam.Name.Default,
 			game.HomeTeam.Name.Default,
 			gameTime)
-		
+
 		if game.GameState == "LIVE" || game.GameState == "OFF" {
 			fmt.Printf("Score: %s %d, %s %d\n",
 				game.AwayTeam.Name.Default, game.AwayTeam.Score,
 				game.HomeTeam.Name.Default, game.HomeTeam.Score)
-			
+
 			if game.GameState == "LIVE" {
-				fmt.Printf("Period: %d (%s)\n", 
+				fmt.Printf("Period: %d (%s)\n",
 					game.Period,
 					game.PeriodDescriptor.PeriodType)
 			}
@@ -160,7 +161,7 @@ func displaySkaterStats(stats *nhl.SkaterStatsResponse) {
 	fmt.Printf("Shots: %d\n", current.Shots)
 	fmt.Printf("Shooting %%: %.1f\n", current.ShootingPct)
 	fmt.Printf("TOI/Game: %.1f\n", current.TimeOnIcePerGame)
-	
+
 	if current.FaceoffWinPct > 0 {
 		fmt.Printf("Faceoff Win %%: %.1f\n", current.FaceoffWinPct)
 	}
@@ -179,7 +180,7 @@ func displaySkaterStats(stats *nhl.SkaterStatsResponse) {
 		fmt.Printf("Games: %d\n", totalGames)
 		fmt.Printf("Goals: %d\n", totalGoals)
 		fmt.Printf("Assists: %d\n", totalAssists)
-		fmt.Printf("Points: %d (%.2f per game)\n", 
+		fmt.Printf("Points: %d (%.2f per game)\n",
 			totalPoints, float64(totalPoints)/float64(totalGames))
 	}
 }
@@ -214,7 +215,7 @@ func displayGoalieStats(stats *nhl.GoalieStatsResponse) {
 	fmt.Printf("Saves: %d\n", current.Saves)
 	fmt.Printf("Goals Against: %d\n", current.GoalsAgainst)
 	fmt.Printf("Time on Ice: %s\n", formatTimeOnIce(current.TimeOnIce))
-	
+
 	if current.Points > 0 {
 		fmt.Printf("\nScoring:\n")
 		fmt.Printf("Goals: %d\n", current.Goals)
@@ -283,7 +284,7 @@ func displaySeasonStats(stats []nhl.SeasonTotal, gameType nhl.GameType) {
 	fmt.Printf("Shots: %d\n", current.Shots)
 	fmt.Printf("Shooting %%: %.1f\n", current.ShootingPctg)
 	fmt.Printf("TOI/Game: %s\n", current.AvgTOI)
-	
+
 	if current.FaceoffWinningPctg > 0 {
 		fmt.Printf("Faceoff Win %%: %.1f\n", current.FaceoffWinningPctg)
 	}
@@ -302,7 +303,7 @@ func displaySeasonStats(stats []nhl.SeasonTotal, gameType nhl.GameType) {
 		fmt.Printf("Games: %d\n", totalGames)
 		fmt.Printf("Goals: %d\n", totalGoals)
 		fmt.Printf("Assists: %d\n", totalAssists)
-		fmt.Printf("Points: %d (%.2f per game)\n", 
+		fmt.Printf("Points: %d (%.2f per game)\n",
 			totalPoints, float64(totalPoints)/float64(totalGames))
 	}
 }
@@ -324,10 +325,10 @@ func getCurrentSeasonID() int {
 	now := time.Now()
 	year := now.Year()
 	// NHL season typically starts in October
-	if now.Month() < time.July {
-		year-- // If we're in the first half of the year, we're in the previous year's season
+	if now.Month() < time.October {
+		year-- // If we're before October, we're in the previous year's season
 	}
-	return year * 10000
+	return year*10000 + (year + 1)
 }
 
 func main() {
@@ -339,7 +340,8 @@ func main() {
 	examplePlayerSearch := false
 	exampleSkaterSearch := false
 	exampleGoalieSearch := false
-	exampleSeasonStats := true
+	exampleSeasonStats := false
+	exampleTeamSchedule := true
 
 	if exampleGetCurrentSchedule {
 		// Get today's schedule with default sort (ascending - earliest games first)
@@ -367,9 +369,9 @@ func main() {
 	if exampleGetRoster {
 		// Example: Get roster for teams using different identifier types
 		identifiers := []string{
-			"TOR",                  // by abbreviation
-			"Montreal Canadiens",   // by full name
-			"6",                    // by ID (Boston Bruins)
+			"TOR",                // by abbreviation
+			"Montreal Canadiens", // by full name
+			"6",                  // by ID (Boston Bruins)
 		}
 		for _, identifier := range identifiers {
 			roster, err := client.GetTeamRoster(identifier)
@@ -420,7 +422,7 @@ func main() {
 
 	if exampleSkaterSearch {
 		// Example: Search for a skater and display their stats
-		searchName := "Matthews"  // Search for Auston Matthews
+		searchName := "Matthews" // Search for Auston Matthews
 		players, err := client.SearchPlayer(searchName)
 		if err != nil {
 			fmt.Printf("Error searching for skater %s: %v\n", searchName, err)
@@ -484,7 +486,7 @@ func main() {
 
 	if exampleGoalieSearch {
 		// Example: Search for a goalie and display their stats
-		searchName := "Woll"  // Search for Joseph Woll
+		searchName := "Woll" // Search for Joseph Woll
 		players, err := client.SearchPlayer(searchName)
 		if err != nil {
 			fmt.Printf("Error searching for goalie %s: %v\n", searchName, err)
@@ -548,7 +550,7 @@ func main() {
 
 	if exampleSeasonStats {
 		// Example: Get stats for a specific season
-		searchName := "Matthews"  // Search for Auston Matthews
+		searchName := "Matthews" // Search for Auston Matthews
 		players, err := client.SearchPlayer(searchName)
 		if err != nil {
 			fmt.Printf("Error searching for player %s: %v\n", searchName, err)
@@ -575,8 +577,8 @@ func main() {
 
 		fmt.Println("\nAvailable NHL Seasons:")
 		for _, season := range allStats {
-			fmt.Printf("- %d-%d (%s): %d games played, %d goals, %d points\n", 
-				season.Season/10000, 
+			fmt.Printf("- %d-%d (%s): %d games played, %d goals, %d points\n",
+				season.Season/10000,
 				(season.Season/10000)+1,
 				getGameTypeName(nhl.GameType(season.GameTypeID)),
 				season.GamesPlayed,
@@ -593,18 +595,18 @@ func main() {
 			seasonID int
 			gameType nhl.GameType
 		}{
-			{currentSeasonID, nhl.GameTypeRegularSeason},    // Current season
-			{previousSeasonID, nhl.GameTypeRegularSeason},   // Previous season
-			{previousSeasonID, nhl.GameTypePlayoffs},        // Previous season playoffs
+			{currentSeasonID, nhl.GameTypeRegularSeason},  // Current season
+			{previousSeasonID, nhl.GameTypeRegularSeason}, // Previous season
+			{previousSeasonID, nhl.GameTypePlayoffs},      // Previous season playoffs
 		}
 
 		// Show stats for each season
 		for _, s := range seasons {
-			fmt.Printf("\nStats for %d-%d %s:\n", 
-				s.seasonID/10000, 
+			fmt.Printf("\nStats for %d-%d %s:\n",
+				s.seasonID/10000,
 				(s.seasonID/10000)+1,
 				getGameTypeName(s.gameType))
-			
+
 			stats, err := client.GetFilteredPlayerStats(player.PlayerID, &nhl.StatsFilter{
 				GameType: s.gameType,
 				SeasonID: s.seasonID,
@@ -639,6 +641,42 @@ func main() {
 				season.Goals,
 				season.GamesPlayed,
 				float64(season.Goals)/float64(season.GamesPlayed))
+		}
+	}
+
+	if exampleTeamSchedule {
+		// Example: Get Toronto Maple Leafs schedule
+		team, err := client.GetTeamByIdentifier("TOR")
+		if err != nil {
+			log.Fatalf("Failed to get team: %v", err)
+		}
+
+		seasonID := getCurrentSeasonID()
+		schedule, err := client.GetTeamSchedule(team, seasonID)
+		if err != nil {
+			log.Fatalf("Failed to get schedule: %v", err)
+		}
+
+		// Print schedule
+		fmt.Printf("Schedule for %s (%d-%d):\n", team.Name.Default, seasonID/10000, (seasonID/10000)+1)
+		for _, game := range schedule.Games {
+			gameTime, err := time.Parse(time.RFC3339, game.StartTimeUTC)
+			if err != nil {
+				log.Printf("Error parsing game time: %v", err)
+				continue
+			}
+
+			var opponentAbbrev string
+			var location string
+			if game.HomeTeam.Abbreviation == team.Abbreviation {
+				opponentAbbrev = game.AwayTeam.Abbreviation
+				location = "vs"
+			} else {
+				opponentAbbrev = game.HomeTeam.Abbreviation
+				location = "@"
+			}
+
+			fmt.Printf("%s: %s %s\n", gameTime.Format("2006-01-02"), location, opponentAbbrev)
 		}
 	}
 }

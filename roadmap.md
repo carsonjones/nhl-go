@@ -5,7 +5,7 @@
 ### Schedule and Scores
 - [x] Get Current Day's Schedule
 - [x] Get Schedule by Date
-- [ ] Get Team Schedule
+- [x] Get Team Schedule
 - [ ] Get Game Details
 - [ ] Get Game Stats/Boxscore
 - [ ] Get Live Game Updates
