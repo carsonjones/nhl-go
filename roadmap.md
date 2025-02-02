@@ -6,15 +6,15 @@
 - [x] Get Current Day's Schedule
 - [x] Get Schedule by Date
 - [x] Get Team Schedule
-- [ ] Get Game Details
-- [ ] Get Game Stats/Boxscore
+- [x] Get Game Details
+- [x] Get Game Stats/Boxscore
+- [x] Get Play-by-Play Data
 - [ ] Get Live Game Updates
-- [ ] Get Play-by-Play Data
 
 ### Teams
 - [x] Get Team Details
 - [x] Get Team Roster
-- [ ] Get Team Stats
+- [x] Get Team Stats
 - [ ] Get Team History
 - [ ] Get Head-to-Head Records
 - [ ] Get Team Trends
@@ -57,38 +57,38 @@
 ## Priority Queue
 
 ### High Priority
-1. Team Schedule - Essential for following specific teams
-2. Standings - Core feature for understanding team performance
-3. Game Details/Boxscore - Detailed game information
-4. League Leaders - Important for player performance context
+1. Live Game Updates - Real-time game information
+2. Team History and Head-to-Head Records
+3. League Leaders - Important for player performance context
+4. Player Game Logs - Detailed player performance tracking
 
 ### Medium Priority
-1. Player Game Logs - Detailed player performance tracking
-2. Team Stats - Comprehensive team statistics
-3. Live Game Updates - Real-time game information
-4. Recent Transactions - Team roster changes
+1. Team Trends - Performance analysis over time
+2. Recent Transactions - Team roster changes
+3. Playoff Picture/Race - Playoff implications
+4. Advanced Stats - Detailed statistical analysis
 
 ### Low Priority
 1. Historical Data - Past seasons and records
-2. Advanced Stats - Detailed statistical analysis
-3. Player Draft Information - Background information
-4. News/Updates - Supplementary information
+2. Player Draft Information - Background information
+3. News/Updates - Supplementary information
+4. Injury Reports - Player availability
 
 ## Implementation Notes
 
 ### API Endpoints
-- Base URL: `https://api.nhle.com/stats/rest/en`
+- Base URL: `https://api-web.nhle.com/v1`
 - Schedule endpoint: `/schedule`
 - Player endpoint: `/player`
 - Team endpoint: `/team`
-- Game endpoint: `/game`
+- Game endpoint: `/gamecenter`
 
 ### Data Models
 - Need to implement models for:
-  - Game Details
-  - Standings
-  - Team Stats
   - Advanced Stats
+  - Historical Data
+  - League Leaders
+  - Live Updates
 
 ### Future Considerations
 - Caching strategy for frequently accessed data

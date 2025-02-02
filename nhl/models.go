@@ -101,16 +101,12 @@ type Record struct {
 
 // TeamStats represents team statistics
 type TeamStats struct {
-	Wins         int    `json:"wins"`
-	Losses       int    `json:"losses"`
-	OtLosses     int    `json:"otLosses"`
-	Points       int    `json:"points"`
-	GoalsFor     int    `json:"goalsFor"`
-	GoalsAgainst int    `json:"goalsAgainst"`
-	GoalDiff     int    `json:"goalDiff"`
-	HomeRecord   Record `json:"homeRecord"`
-	AwayRecord   Record `json:"awayRecord"`
-	L10Record    Record `json:"l10Record"`
+	Goals       int            `json:"goals"`
+	ShotsOnGoal int            `json:"sog"`
+	FaceoffPct  float64        `json:"faceoffPct"`
+	Hits        int            `json:"hits"`
+	PIM         int            `json:"pim"`
+	PowerPlay   PowerPlayStats `json:"powerPlay"`
 }
 
 // ScoreboardResponse represents the NHL score response
@@ -366,4 +362,334 @@ type StandingsTeam struct {
 type TeamAbbrev struct {
 	Default string `json:"default"`
 	French  string `json:"french,omitempty"`
+}
+
+// GameDetails represents detailed information about a specific game
+type GameDetails struct {
+	ID           int           `json:"id"`
+	GameType     int           `json:"gameType"`
+	Season       int           `json:"season"`
+	GameDate     string        `json:"gameDate"`
+	StartTimeUTC string        `json:"startTimeUTC"`
+	Venue        Venue         `json:"venue"`
+	GameState    string        `json:"gameState"`
+	HomeTeam     DetailedTeam  `json:"homeTeam"`
+	AwayTeam     DetailedTeam  `json:"awayTeam"`
+	Clock        GameClock     `json:"clock"`
+	TVBroadcasts []TVBroadcast `json:"tvBroadcasts"`
+	Summary      GameSummary   `json:"summary"`
+	ThreeStars   []StarPlayer  `json:"threeStars"`
+}
+
+// DetailedTeam represents a team with detailed game information
+type DetailedTeam struct {
+	ID                       int           `json:"id"`
+	CommonName               LanguageNames `json:"commonName"`
+	Abbrev                   string        `json:"abbrev"`
+	PlaceName                LanguageNames `json:"placeName"`
+	PlaceNameWithPreposition LanguageNames `json:"placeNameWithPreposition"`
+	Score                    int           `json:"score"`
+	ShotsOnGoal              int           `json:"sog"`
+	Logo                     string        `json:"logo"`
+	DarkLogo                 string        `json:"darkLogo"`
+}
+
+// GameSummary represents the scoring and penalty summary
+type GameSummary struct {
+	Scoring   []PeriodSummary   `json:"scoring"`
+	Shootout  []interface{}     `json:"shootout"`
+	Penalties []PeriodPenalties `json:"penalties"`
+}
+
+// PeriodSummary represents scoring information for a period
+type PeriodSummary struct {
+	PeriodDescriptor PeriodDescriptor `json:"periodDescriptor"`
+	Goals            []GoalEvent      `json:"goals"`
+}
+
+// PeriodPenalties represents penalties for a period
+type PeriodPenalties struct {
+	PeriodDescriptor PeriodDescriptor `json:"periodDescriptor"`
+	Penalties        []PenaltyEvent   `json:"penalties"`
+}
+
+// GoalEvent represents a goal scored in the game
+type GoalEvent struct {
+	SituationCode     string         `json:"situationCode"`
+	Strength          string         `json:"strength"`
+	PlayerID          int            `json:"playerId"`
+	FirstName         LanguageNames  `json:"firstName"`
+	LastName          LanguageNames  `json:"lastName"`
+	Name              LanguageNames  `json:"name"`
+	TeamAbbrev        LanguageNames  `json:"teamAbbrev"`
+	TimeInPeriod      string         `json:"timeInPeriod"`
+	ShotType          string         `json:"shotType"`
+	GoalModifier      string         `json:"goalModifier"`
+	AwayScore         int            `json:"awayScore"`
+	HomeScore         int            `json:"homeScore"`
+	LeadingTeamAbbrev *LanguageNames `json:"leadingTeamAbbrev,omitempty"`
+	Assists           []AssistEvent  `json:"assists"`
+}
+
+// AssistEvent represents an assist on a goal
+type AssistEvent struct {
+	PlayerID      int           `json:"playerId"`
+	FirstName     LanguageNames `json:"firstName"`
+	LastName      LanguageNames `json:"lastName"`
+	Name          LanguageNames `json:"name"`
+	AssistsToDate int           `json:"assistsToDate"`
+	SweaterNumber int           `json:"sweaterNumber"`
+}
+
+// PenaltyEvent represents a penalty called in the game
+type PenaltyEvent struct {
+	TimeInPeriod      string        `json:"timeInPeriod"`
+	Type              string        `json:"type"`
+	Duration          int           `json:"duration"`
+	CommittedByPlayer string        `json:"committedByPlayer"`
+	TeamAbbrev        LanguageNames `json:"teamAbbrev"`
+	DrawnBy           string        `json:"drawnBy"`
+	DescKey           string        `json:"descKey"`
+}
+
+// StarPlayer represents a player selected as one of the three stars
+type StarPlayer struct {
+	Star       int           `json:"star"`
+	PlayerID   int           `json:"playerId"`
+	TeamAbbrev string        `json:"teamAbbrev"`
+	Headshot   string        `json:"headshot"`
+	Name       LanguageNames `json:"name"`
+	SweaterNo  int           `json:"sweaterNo"`
+	Position   string        `json:"position"`
+	Goals      int           `json:"goals,omitempty"`
+	Assists    int           `json:"assists,omitempty"`
+	Points     int           `json:"points,omitempty"`
+	SavePctg   float64       `json:"savePctg,omitempty"`
+}
+
+// TeamGameStats represents a team's stats for a specific game
+type TeamGameStats struct {
+	ID           int             `json:"id"`
+	Name         LanguageNames   `json:"name"`
+	Abbreviation string          `json:"abbrev"`
+	Score        int             `json:"score"`
+	ShotsOnGoal  int             `json:"sog"`
+	FaceoffPct   float64         `json:"faceoffPct"`
+	PowerPlay    PowerPlayStats  `json:"powerPlay"`
+	Scratches    []PlayerBrief   `json:"scratches"`
+	Leaders      GameTeamLeaders `json:"leaders"`
+}
+
+// PowerPlayStats represents power play statistics
+type PowerPlayStats struct {
+	Goals         int     `json:"goals"`
+	Opportunities int     `json:"opportunities"`
+	Percentage    float64 `json:"percentage"`
+}
+
+// GameTeamLeaders represents team leaders in various categories for a game
+type GameTeamLeaders struct {
+	Goals   []PlayerBrief `json:"goals"`
+	Assists []PlayerBrief `json:"assists"`
+	Points  []PlayerBrief `json:"points"`
+}
+
+// PlayerBrief represents basic player information
+type PlayerBrief struct {
+	ID       int           `json:"id"`
+	Name     LanguageNames `json:"name"`
+	Position string        `json:"position"`
+	Number   string        `json:"sweaterNumber"`
+}
+
+// GameClock represents the game clock state
+type GameClock struct {
+	TimeRemaining  string `json:"timeRemaining"`
+	IsIntermission bool   `json:"isIntermission"`
+	InIntermission bool   `json:"inIntermission"`
+}
+
+// BoxscoreResponse represents the boxscore data for a game
+type BoxscoreResponse struct {
+	ID                int             `json:"id"`
+	Season            int             `json:"season"`
+	GameType          int             `json:"gameType"`
+	GameDate          string          `json:"gameDate"`
+	StartTimeUTC      string          `json:"startTimeUTC"`
+	Venue             Venue           `json:"venue"`
+	GameState         string          `json:"gameState"`
+	HomeTeam          DetailedTeam    `json:"homeTeam"`
+	AwayTeam          DetailedTeam    `json:"awayTeam"`
+	PlayerByGameStats PlayerGameStats `json:"playerByGameStats"`
+}
+
+// PlayerGameStats represents player statistics for both teams
+type PlayerGameStats struct {
+	HomeTeam TeamPlayerStats `json:"homeTeam"`
+	AwayTeam TeamPlayerStats `json:"awayTeam"`
+}
+
+// TeamPlayerStats represents player statistics for a team
+type TeamPlayerStats struct {
+	Forwards []PlayerStats     `json:"forwards"`
+	Defense  []PlayerStats     `json:"defense"`
+	Goalies  []GoalieGameStats `json:"goalies"`
+}
+
+// PlayerStats represents statistics for a skater
+type PlayerStats struct {
+	PlayerID          int           `json:"playerId"`
+	SweaterNumber     int           `json:"sweaterNumber"`
+	Name              LanguageNames `json:"name"`
+	Position          string        `json:"position"`
+	Goals             int           `json:"goals"`
+	Assists           int           `json:"assists"`
+	Points            int           `json:"points"`
+	PlusMinus         int           `json:"plusMinus"`
+	PIM               int           `json:"pim"`
+	Hits              int           `json:"hits"`
+	PowerPlayGoals    int           `json:"powerPlayGoals"`
+	SOG               int           `json:"sog"`
+	FaceoffWinningPct float64       `json:"faceoffWinningPctg"`
+	TOI               string        `json:"toi"`
+	BlockedShots      int           `json:"blockedShots"`
+	Shifts            int           `json:"shifts"`
+	Giveaways         int           `json:"giveaways"`
+	Takeaways         int           `json:"takeaways"`
+}
+
+// GoalieGameStats represents statistics for a goalie
+type GoalieGameStats struct {
+	PlayerID                 int           `json:"playerId"`
+	SweaterNumber            int           `json:"sweaterNumber"`
+	Name                     LanguageNames `json:"name"`
+	Position                 string        `json:"position"`
+	EvenStrengthShotsAgainst string        `json:"evenStrengthShotsAgainst"`
+	PowerPlayShotsAgainst    string        `json:"powerPlayShotsAgainst"`
+	ShorthandedShotsAgainst  string        `json:"shorthandedShotsAgainst"`
+	SaveShotsAgainst         string        `json:"saveShotsAgainst"`
+	SavePctg                 float64       `json:"savePctg"`
+	EvenStrengthGoalsAgainst int           `json:"evenStrengthGoalsAgainst"`
+	PowerPlayGoalsAgainst    int           `json:"powerPlayGoalsAgainst"`
+	ShorthandedGoalsAgainst  int           `json:"shorthandedGoalsAgainst"`
+	PIM                      int           `json:"pim"`
+	GoalsAgainst             int           `json:"goalsAgainst"`
+	TOI                      string        `json:"toi"`
+	Starter                  bool          `json:"starter"`
+	Decision                 string        `json:"decision,omitempty"`
+	ShotsAgainst             int           `json:"shotsAgainst"`
+	Saves                    int           `json:"saves"`
+}
+
+// PeriodStats represents statistics for a game period
+type PeriodStats struct {
+	PeriodNumber int              `json:"periodNumber"`
+	HomeScore    int              `json:"homeScore"`
+	AwayScore    int              `json:"awayScore"`
+	Goals        []GoalSummary    `json:"goals"`
+	Penalties    []PenaltySummary `json:"penalties"`
+}
+
+// GoalSummary represents a goal scored in the game
+type GoalSummary struct {
+	Period       int           `json:"period"`
+	TimeInPeriod string        `json:"timeInPeriod"`
+	GoalType     string        `json:"goalType"`
+	ScoredBy     PlayerBrief   `json:"scoredBy"`
+	AssistedBy   []PlayerBrief `json:"assistedBy"`
+}
+
+// PenaltySummary represents a penalty called in the game
+type PenaltySummary struct {
+	Period       int         `json:"period"`
+	TimeInPeriod string      `json:"timeInPeriod"`
+	Type         string      `json:"type"`
+	Minutes      int         `json:"minutes"`
+	Player       PlayerBrief `json:"player"`
+}
+
+// PenaltyBoxItem represents a player currently in the penalty box
+type PenaltyBoxItem struct {
+	Player        PlayerBrief `json:"player"`
+	TimeRemaining string      `json:"timeRemaining"`
+	Type          string      `json:"type"`
+}
+
+// Official represents a game official
+type Official struct {
+	Name string `json:"name"`
+	Role string `json:"role"`
+}
+
+// Coach represents a team coach
+type Coach struct {
+	Name     string `json:"name"`
+	Position string `json:"position"`
+}
+
+// PlayByPlayResponse represents play-by-play data for a game
+type PlayByPlayResponse struct {
+	Plays       []PlayEvent  `json:"plays"`
+	RosterSpots []RosterSpot `json:"rosterSpots"`
+}
+
+// RosterSpot represents a player in the game roster
+type RosterSpot struct {
+	TeamID        int           `json:"teamId"`
+	PlayerID      int           `json:"playerId"`
+	FirstName     LanguageNames `json:"firstName"`
+	LastName      LanguageNames `json:"lastName"`
+	SweaterNumber int           `json:"sweaterNumber"`
+	PositionCode  string        `json:"positionCode"`
+	Headshot      string        `json:"headshot"`
+}
+
+// PlayEvent represents a single event in the game
+type PlayEvent struct {
+	EventID          int              `json:"eventId"`
+	PeriodDescriptor PeriodDescriptor `json:"periodDescriptor"`
+	TimeInPeriod     string           `json:"timeInPeriod"`
+	TimeRemaining    string           `json:"timeRemaining"`
+	SituationCode    string           `json:"situationCode"`
+	TypeCode         int              `json:"typeCode"`
+	TypeDescKey      string           `json:"typeDescKey"`
+	Details          EventDetails     `json:"details"`
+}
+
+// EventDetails represents details about a play event
+type EventDetails struct {
+	EventOwnerTeamID    int     `json:"eventOwnerTeamId,omitempty"`
+	XCoord              float64 `json:"xCoord,omitempty"`
+	YCoord              float64 `json:"yCoord,omitempty"`
+	ZoneCode            string  `json:"zoneCode,omitempty"`
+	ShotType            string  `json:"shotType,omitempty"`
+	ShootingPlayerID    int     `json:"shootingPlayerId,omitempty"`
+	GoalieInNetID       int     `json:"goalieInNetId,omitempty"`
+	BlockingPlayerID    int     `json:"blockingPlayerId,omitempty"`
+	HittingPlayerID     int     `json:"hittingPlayerId,omitempty"`
+	HitteePlayerID      int     `json:"hitteePlayerId,omitempty"`
+	WinningPlayerID     int     `json:"winningPlayerId,omitempty"`
+	LosingPlayerID      int     `json:"losingPlayerId,omitempty"`
+	Reason              string  `json:"reason,omitempty"`
+	TypeCode            string  `json:"typeCode,omitempty"`
+	DescKey             string  `json:"descKey,omitempty"`
+	Duration            int     `json:"duration,omitempty"`
+	CommittedByPlayerID int     `json:"committedByPlayerId,omitempty"`
+	DrawnByPlayerID     int     `json:"drawnByPlayerId,omitempty"`
+	AwaySOG             int     `json:"awaySOG,omitempty"`
+	HomeSOG             int     `json:"homeSOG,omitempty"`
+	ScoringPlayerID     int     `json:"scoringPlayerId,omitempty"`
+	ScoringPlayerTotal  int     `json:"scoringPlayerTotal,omitempty"`
+	Assist1PlayerID     int     `json:"assist1PlayerId,omitempty"`
+	Assist1PlayerTotal  int     `json:"assist1PlayerTotal,omitempty"`
+	Assist2PlayerID     int     `json:"assist2PlayerId,omitempty"`
+	Assist2PlayerTotal  int     `json:"assist2PlayerTotal,omitempty"`
+}
+
+// GameStoryResponse represents the game story/narrative
+type GameStoryResponse struct {
+	GameID      int    `json:"id"`
+	Headline    string `json:"headline"`
+	SubHeadline string `json:"subHead"`
+	Story       string `json:"story"`
 }
