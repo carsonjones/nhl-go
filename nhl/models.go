@@ -322,3 +322,48 @@ type TeamInSchedule struct {
 type PlayerStatsResponse struct {
 	Splits []SeasonTotal `json:"splits"`
 }
+
+// StandingsResponse represents the NHL standings response
+type StandingsResponse struct {
+	Standings []StandingsTeam `json:"standings"`
+}
+
+// StandingsTeam represents a team's standings information
+type StandingsTeam struct {
+	TeamName          LanguageNames `json:"teamName"`
+	TeamAbbrev        TeamAbbrev    `json:"teamAbbrev"`
+	Conference        string        `json:"conferenceName"`
+	Division          string        `json:"divisionName"`
+	Wins              int           `json:"wins"`
+	Losses            int           `json:"losses"`
+	OtLosses          int           `json:"otLosses"`
+	RegulationWins    int           `json:"regulationWins"`
+	Points            int           `json:"points"`
+	GamesPlayed       int           `json:"gamesPlayed"`
+	GoalsFor          int           `json:"goalFor"`
+	GoalsAgainst      int           `json:"goalAgainst"`
+	GoalDifferential  int           `json:"goalDifferential"`
+	StreakCode        string        `json:"streakCode"`
+	StreakCount       int           `json:"streakCount"`
+	HomeGamesPlayed   int           `json:"homeGamesPlayed"`
+	HomeWins          int           `json:"homeWins"`
+	HomeLosses        int           `json:"homeLosses"`
+	HomeOtLosses      int           `json:"homeOtLosses"`
+	HomePoints        int           `json:"homePoints"`
+	L10GamesPlayed    int           `json:"l10GamesPlayed"`
+	L10Wins           int           `json:"l10Wins"`
+	L10Losses         int           `json:"l10Losses"`
+	L10OtLosses       int           `json:"l10OtLosses"`
+	L10Points         int           `json:"l10Points"`
+	PlaceInLeague     int           `json:"leagueSequence"`
+	PlaceInConference int           `json:"conferenceSequence"`
+	PlaceInDivision   int           `json:"divisionSequence"`
+	WildCardSequence  int           `json:"wildcardSequence"`
+	PointsPercentage  float64       `json:"pointsPercentage"`
+}
+
+// TeamAbbrev represents a team's abbreviation in different formats
+type TeamAbbrev struct {
+	Default string `json:"default"`
+	French  string `json:"french,omitempty"`
+}

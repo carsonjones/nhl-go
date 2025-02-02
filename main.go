@@ -16,9 +16,11 @@ func main() {
 	exampleGetRoster := false
 	examplePlayerSearch := false
 	exampleSkaterSearch := false
-	exampleGoalieSearch := true
+	exampleGoalieSearch := false
 	exampleSeasonStats := false
 	exampleTeamSchedule := false
+	exampleCurrentStandings := true
+	exampleStandingsByDate := false
 
 	// Track if any example was run
 	examplesRun := false
@@ -79,6 +81,20 @@ func main() {
 		}
 	}
 
+	if exampleCurrentStandings {
+		examplesRun = true
+		if err := examples.GetCurrentStandings(client); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	if exampleStandingsByDate {
+		examplesRun = true
+		if err := examples.GetStandingsByDate(client, "2024-02-01"); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if !examplesRun {
 		fmt.Println("Available examples (set the corresponding flag to true to run):")
 		fmt.Println("- exampleGetCurrentSchedule: Get today's NHL schedule")
@@ -89,5 +105,7 @@ func main() {
 		fmt.Println("- exampleGoalieSearch: Search for goalies with detailed stats")
 		fmt.Println("- exampleSeasonStats: Get player stats across seasons")
 		fmt.Println("- exampleTeamSchedule: Get a team's full schedule")
+		fmt.Println("- exampleCurrentStandings: Get current NHL standings")
+		fmt.Println("- exampleStandingsByDate: Get NHL standings for a specific date")
 	}
 }
