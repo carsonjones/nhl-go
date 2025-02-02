@@ -140,16 +140,6 @@ type PeriodDescriptor struct {
 	MaxRegulationPeriods int    `json:"maxRegulationPeriods"`
 }
 
-// GameSort represents the sorting options for games
-type GameSort int
-
-const (
-	// SortByDateAsc sorts games by date and time in ascending order (earliest first)
-	SortByDateAsc GameSort = iota
-	// SortByDateDesc sorts games by date and time in descending order (latest first)
-	SortByDateDesc
-)
-
 // FilteredScoreboardResponse represents the NHL score response for a specific date
 type FilteredScoreboardResponse struct {
 	Date  string `json:"date"`
@@ -264,18 +254,6 @@ type GoalieStatsResponse struct {
 	Total int           `json:"total"`
 }
 
-// GameType represents different types of games (regular season, playoffs, etc.)
-type GameType int
-
-const (
-	// GameTypeRegularSeason represents regular season games
-	GameTypeRegularSeason GameType = 2
-	// GameTypePlayoffs represents playoff games
-	GameTypePlayoffs GameType = 3
-	// GameTypeAllStar represents all-star games
-	GameTypeAllStar GameType = 4
-)
-
 // StatsFilter represents filters for retrieving player statistics
 type StatsFilter struct {
 	GameType GameType
@@ -338,4 +316,9 @@ type TeamInSchedule struct {
 	Name         LanguageNames `json:"name"`
 	Abbreviation string        `json:"abbrev"`
 	Score        int           `json:"score"`
+}
+
+// PlayerStatsResponse represents a response containing player statistics
+type PlayerStatsResponse struct {
+	Splits []SeasonTotal `json:"splits"`
 }

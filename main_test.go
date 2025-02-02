@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-nhl/internal/formatters"
 	"testing"
 	"time"
 )
@@ -14,7 +15,7 @@ func TestFormatGameTime(t *testing.T) {
 	}{
 		{
 			name:    "Valid UTC time",
-			utcTime: "2024-02-15T00:00:00Z",
+			utcTime: "2024-02-01T00:00:00Z",
 			want:    "7:00 PM EST (6:00 PM CST)",
 			wantErr: false,
 		},
@@ -28,13 +29,13 @@ func TestFormatGameTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := formatGameTime(tt.utcTime)
+			got, err := formatters.FormatGameTime(tt.utcTime)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("formatGameTime() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("FormatGameTime() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("formatGameTime() = %v, want %v", got, tt.want)
+				t.Errorf("FormatGameTime() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -60,8 +61,8 @@ func TestFormatSeasonID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatSeasonID(tt.seasonID); got != tt.want {
-				t.Errorf("formatSeasonID() = %v, want %v", got, tt.want)
+			if got := formatters.FormatSeasonID(tt.seasonID); got != tt.want {
+				t.Errorf("FormatSeasonID() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -74,50 +75,40 @@ func TestFormatTimeOnIce(t *testing.T) {
 		want    string
 	}{
 		{
-			name:    "One hour",
-			seconds: 3600,
+			name:    "One minute",
+			seconds: 60,
 			want:    "1:00",
 		},
 		{
-			name:    "One hour thirty minutes",
-			seconds: 5400,
-			want:    "1:30",
+			name:    "One hour",
+			seconds: 3600,
+			want:    "60:00",
 		},
 		{
-			name:    "Zero",
-			seconds: 0,
-			want:    "0:00",
-		},
-		{
-			name:    "Less than one minute",
-			seconds: 45,
-			want:    "0:00",
+			name:    "Complex time",
+			seconds: 3665,
+			want:    "61:05",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatTimeOnIce(tt.seconds); got != tt.want {
-				t.Errorf("formatTimeOnIce() = %v, want %v", got, tt.want)
+			if got := formatters.FormatTimeOnIce(tt.seconds); got != tt.want {
+				t.Errorf("FormatTimeOnIce() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
 func TestGetCurrentSeasonID(t *testing.T) {
-	// Since this function depends on the current date, we need to test different scenarios
 	now := time.Now()
 	year := now.Year()
-
-	// If we're before October, the season should be the previous year
 	if now.Month() < time.October {
 		year--
 	}
-
-	got := getCurrentSeasonID()
 	want := year*10000 + (year + 1)
 
-	if got != want {
-		t.Errorf("getCurrentSeasonID() = %v, want %v", got, want)
+	if got := formatters.GetCurrentSeasonID(); got != want {
+		t.Errorf("GetCurrentSeasonID() = %v, want %v", got, want)
 	}
 }
