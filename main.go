@@ -341,7 +341,7 @@ func main() {
 	exampleSkaterSearch := false
 	exampleGoalieSearch := false
 	exampleSeasonStats := false
-	exampleTeamSchedule := true
+	exampleTeamSchedule := false
 
 	if exampleGetCurrentSchedule {
 		// Get today's schedule with default sort (ascending - earliest games first)
