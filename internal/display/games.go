@@ -451,3 +451,89 @@ func FormatAssists(assists []nhl.PlayerBrief) string {
 	}
 	return strings.Join(names, ", ")
 }
+
+// LiveGameUpdates displays live game information
+func LiveGameUpdates(updates *nhl.ScoreboardResponse) {
+	if updates == nil || len(updates.GamesByDate) == 0 {
+		fmt.Println("No games found")
+		return
+	}
+
+	now := time.Now()
+	hasGames := false
+
+	for _, gameDate := range updates.GamesByDate {
+		var activeGames []nhl.Game
+		for _, game := range gameDate.Games {
+			gameTime, err := time.Parse("2006-01-02T15:04:05Z", game.StartTimeUTC)
+			if err != nil {
+				continue
+			}
+
+			// Include games that:
+			// 1. Are currently live
+			// 2. Have finished within the last hour
+			// 3. Are starting within the next hour
+			timeSinceEnd := now.Sub(gameTime)
+			timeUntilStart := gameTime.Sub(now)
+
+			if game.GameState == "LIVE" ||
+				(game.GameState == "FINAL" && timeSinceEnd < time.Hour) ||
+				(game.GameState == "OFF" && timeSinceEnd < time.Hour) ||
+				(game.GameState == "PRE" && timeUntilStart < time.Hour) {
+				activeGames = append(activeGames, game)
+			}
+		}
+
+		if len(activeGames) > 0 {
+			hasGames = true
+			fmt.Printf("\nGames for %s:\n", gameDate.Date)
+			fmt.Println(strings.Repeat("-", 80))
+
+			for _, game := range activeGames {
+				// Display game status
+				var statusText string
+				switch game.GameState {
+				case "LIVE":
+					statusText = fmt.Sprintf("LIVE - Period %d, %s", game.Period, game.Clock.TimeRemaining)
+					if game.Clock.InIntermission {
+						statusText += " (Intermission)"
+					}
+				case "FINAL", "OFF":
+					statusText = "FINAL"
+					if game.PeriodDescriptor.Number > 3 {
+						if game.PeriodDescriptor.PeriodType == "OT" {
+							statusText += " (OT)"
+						} else if game.PeriodDescriptor.PeriodType == "SO" {
+							statusText += " (SO)"
+						}
+					}
+				case "PRE":
+					localTime, _ := time.Parse("2006-01-02T15:04:05Z", game.StartTimeUTC)
+					statusText = fmt.Sprintf("Starting at %s", localTime.Format("3:04 PM MST"))
+				default:
+					statusText = game.GameState
+				}
+
+				fmt.Printf("\n%s @ %s - %s\n", game.AwayTeam.Name.Default, game.HomeTeam.Name.Default, statusText)
+				fmt.Printf("Score: %s %d, %s %d\n", game.AwayTeam.Abbrev, game.AwayTeam.Score, game.HomeTeam.Abbrev, game.HomeTeam.Score)
+
+				if game.GameState == "LIVE" {
+					fmt.Printf("Shots on Goal: %s %d, %s %d\n", game.AwayTeam.Abbrev, game.AwayTeam.ShotsOnGoal, game.HomeTeam.Abbrev, game.HomeTeam.ShotsOnGoal)
+
+					// Display power play situation if applicable
+					if game.Situation != nil && len(game.Situation.HomeTeam.SituationDescriptions) > 0 {
+						fmt.Printf("Situation: %s %v\n", game.Situation.HomeTeam.Abbrev, game.Situation.HomeTeam.SituationDescriptions)
+					}
+				}
+
+				fmt.Println(strings.Repeat("-", 40))
+			}
+		}
+	}
+
+	if !hasGames {
+		fmt.Println("\nNo active games at the moment.")
+		fmt.Println("Check back later for live game updates!")
+	}
+}

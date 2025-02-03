@@ -47,3 +47,14 @@ func (c *Client) GetGameStory(gameID int) (*GameStoryResponse, error) {
 	}
 	return &response, nil
 }
+
+// GetLiveGameUpdates returns the current scoreboard with live game information
+func (c *Client) GetLiveGameUpdates() (*ScoreboardResponse, error) {
+	url := fmt.Sprintf("%s/scoreboard/now", c.baseURL)
+	var response ScoreboardResponse
+	err := c.get(url, &response)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get live game updates: %w", err)
+	}
+	return &response, nil
+}

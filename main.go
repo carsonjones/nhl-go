@@ -1,32 +1,59 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go-nhl/examples"
 	"go-nhl/nhl"
 	"log"
+	"time"
 )
 
 func main() {
+	// Command line flags
+	var (
+		exampleGetCurrentSchedule  bool
+		exampleGetScheduleByDate   bool
+		exampleGetRoster           bool
+		examplePlayerSearch        bool
+		exampleSkaterSearch        bool
+		exampleGoalieSearch        bool
+		exampleSeasonStats         bool
+		exampleTeamSchedule        bool
+		exampleCurrentStandings    bool
+		exampleStandingsByDate     bool
+		exampleLeagueStandings     bool
+		exampleConferenceStandings bool
+		exampleDivisionStandings   bool
+		exampleGameDetails         bool
+		exampleLiveUpdates         bool
+		gameID                     int
+		updateInterval             int
+	)
+
+	flag.BoolVar(&exampleGetCurrentSchedule, "current-schedule", false, "Get today's NHL schedule")
+	flag.BoolVar(&exampleGetScheduleByDate, "schedule-by-date", false, "Get schedule for a specific date")
+	flag.BoolVar(&exampleGetRoster, "get-roster", false, "Get team rosters")
+	flag.BoolVar(&examplePlayerSearch, "player-search", false, "Search for any player")
+	flag.BoolVar(&exampleSkaterSearch, "skater-search", false, "Search for skaters with detailed stats")
+	flag.BoolVar(&exampleGoalieSearch, "goalie-search", false, "Search for goalies with detailed stats")
+	flag.BoolVar(&exampleSeasonStats, "season-stats", false, "Get player stats across seasons")
+	flag.BoolVar(&exampleTeamSchedule, "team-schedule", false, "Get a team's full schedule")
+	flag.BoolVar(&exampleCurrentStandings, "current-standings", false, "Get current NHL standings")
+	flag.BoolVar(&exampleStandingsByDate, "standings-by-date", false, "Get NHL standings for a specific date")
+	flag.BoolVar(&exampleLeagueStandings, "league-standings", false, "Get overall NHL standings")
+	flag.BoolVar(&exampleConferenceStandings, "conference", false, "Get standings by conference")
+	flag.BoolVar(&exampleDivisionStandings, "division", false, "Get standings by division")
+	flag.BoolVar(&exampleGameDetails, "game", false, "Get detailed game information")
+	flag.IntVar(&gameID, "game-id", 2024020750, "Game ID for game details (default: NYR vs CHI on Feb 9, 2024)")
+	flag.BoolVar(&exampleLiveUpdates, "live", false, "Show live game updates")
+	flag.IntVar(&updateInterval, "interval", 60, "Update interval in seconds for live updates")
+	flag.Parse()
+
+	// Create NHL client
 	client := nhl.NewClient()
 
-	// Example flags
-	exampleGetCurrentSchedule := false
-	exampleGetScheduleByDate := false
-	exampleGetRoster := false
-	examplePlayerSearch := false
-	exampleSkaterSearch := false
-	exampleGoalieSearch := false
-	exampleSeasonStats := false
-	exampleTeamSchedule := false
-	exampleCurrentStandings := false
-	exampleStandingsByDate := false
-	exampleLeagueStandings := false
-	exampleConferenceStandings := false
-	exampleDivisionStandings := false
-	exampleGameDetails := true
-
-	// Track if any example was run
+	// Track if any examples were run
 	examplesRun := false
 
 	if exampleGetCurrentSchedule {
@@ -122,27 +149,38 @@ func main() {
 
 	if exampleGameDetails {
 		examplesRun = true
-		// Use a completed game (2024020750 - NYR vs CHI on Feb 9, 2024)
-		if err := examples.GetGameDetails(client, 2024020750); err != nil {
+		if err := examples.GetGameDetails(client, gameID); err != nil {
 			log.Fatal(err)
 		}
 	}
 
+	if exampleLiveUpdates {
+		examplesRun = true
+		fmt.Printf("Starting live game updates (refreshing every %d seconds). Press Ctrl+C to stop.\n", updateInterval)
+		for {
+			if err := examples.GetLiveGameUpdates(client); err != nil {
+				log.Printf("Error getting live updates: %v", err)
+			}
+			time.Sleep(time.Duration(updateInterval) * time.Second)
+		}
+	}
+
 	if !examplesRun {
-		fmt.Println("Available examples (set the corresponding flag to true to run):")
-		fmt.Println("- exampleGetCurrentSchedule: Get today's NHL schedule")
-		fmt.Println("- exampleGetScheduleByDate: Get schedule for a specific date")
-		fmt.Println("- exampleGetRoster: Get team rosters")
-		fmt.Println("- examplePlayerSearch: Search for any player")
-		fmt.Println("- exampleSkaterSearch: Search for skaters with detailed stats")
-		fmt.Println("- exampleGoalieSearch: Search for goalies with detailed stats")
-		fmt.Println("- exampleSeasonStats: Get player stats across seasons")
-		fmt.Println("- exampleTeamSchedule: Get a team's full schedule")
-		fmt.Println("- exampleCurrentStandings: Get current NHL standings")
-		fmt.Println("- exampleStandingsByDate: Get NHL standings for a specific date")
-		fmt.Println("- exampleLeagueStandings: Get overall NHL standings")
-		fmt.Println("- exampleConferenceStandings: Get standings by conference")
-		fmt.Println("- exampleDivisionStandings: Get standings by division")
-		fmt.Println("- exampleGameDetails: Get detailed game information")
+		fmt.Println("Available examples (use -h flag to see all options):")
+		fmt.Println("- current-schedule: Get today's NHL schedule")
+		fmt.Println("- schedule-by-date: Get schedule for a specific date")
+		fmt.Println("- get-roster: Get team rosters")
+		fmt.Println("- player-search: Search for any player")
+		fmt.Println("- skater-search: Search for skaters with detailed stats")
+		fmt.Println("- goalie-search: Search for goalies with detailed stats")
+		fmt.Println("- season-stats: Get player stats across seasons")
+		fmt.Println("- team-schedule: Get a team's full schedule")
+		fmt.Println("- current-standings: Get current NHL standings")
+		fmt.Println("- standings-by-date: Get NHL standings for a specific date")
+		fmt.Println("- league-standings: Get overall NHL standings")
+		fmt.Println("- conference: Get standings by conference")
+		fmt.Println("- division: Get standings by division")
+		fmt.Println("- game: Get detailed game information")
+		fmt.Println("- live: Show live game updates")
 	}
 }

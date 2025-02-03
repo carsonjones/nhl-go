@@ -9,7 +9,7 @@
 - [x] Get Game Details
 - [x] Get Game Stats/Boxscore
 - [x] Get Play-by-Play Data
-- [ ] Get Live Game Updates
+- [x] Get Live Game Updates
 
 ### Teams
 - [x] Get Team Details
@@ -57,10 +57,9 @@
 ## Priority Queue
 
 ### High Priority
-1. Live Game Updates - Real-time game information
-2. Team History and Head-to-Head Records
-3. League Leaders - Important for player performance context
-4. Player Game Logs - Detailed player performance tracking
+1. Team History and Head-to-Head Records
+2. League Leaders - Important for player performance context
+3. Player Game Logs - Detailed player performance tracking
 
 ### Medium Priority
 1. Team Trends - Performance analysis over time

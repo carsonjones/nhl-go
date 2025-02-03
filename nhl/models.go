@@ -33,6 +33,8 @@ type Game struct {
 	HomeTeam          Team             `json:"homeTeam"`
 	Period            int              `json:"period"`
 	PeriodDescriptor  PeriodDescriptor `json:"periodDescriptor"`
+	Clock             GameClock        `json:"clock"`
+	Situation         *GameSituation   `json:"situation,omitempty"`
 }
 
 // Venue represents a game venue
@@ -48,6 +50,7 @@ type Team struct {
 	PlaceNameWithPreposition LanguageNames `json:"placeNameWithPreposition"`
 	Abbrev                   string        `json:"abbrev"`
 	Score                    int           `json:"score"`
+	ShotsOnGoal              int           `json:"sog"`
 	Logo                     string        `json:"logo"`
 }
 
@@ -111,7 +114,9 @@ type TeamStats struct {
 
 // ScoreboardResponse represents the NHL score response
 type ScoreboardResponse struct {
-	GamesByDate []GamesByDate `json:"gamesByDate"`
+	FocusedDate      string        `json:"focusedDate"`
+	FocusedDateCount int           `json:"focusedDateCount"`
+	GamesByDate      []GamesByDate `json:"gamesByDate"`
 }
 
 // GamesByDate represents games grouped by date
@@ -502,11 +507,12 @@ type PlayerBrief struct {
 	Number   string        `json:"sweaterNumber"`
 }
 
-// GameClock represents the game clock state
+// GameClock represents the game clock information
 type GameClock struct {
-	TimeRemaining  string `json:"timeRemaining"`
-	IsIntermission bool   `json:"isIntermission"`
-	InIntermission bool   `json:"inIntermission"`
+	TimeRemaining    string `json:"timeRemaining"`
+	SecondsRemaining int    `json:"secondsRemaining"`
+	Running          bool   `json:"running"`
+	InIntermission   bool   `json:"inIntermission"`
 }
 
 // BoxscoreResponse represents the boxscore data for a game
@@ -692,4 +698,20 @@ type GameStoryResponse struct {
 	Headline    string `json:"headline"`
 	SubHeadline string `json:"subHead"`
 	Story       string `json:"story"`
+}
+
+// GameSituation represents the current game situation
+type GameSituation struct {
+	HomeTeam struct {
+		Abbrev                string   `json:"abbrev"`
+		SituationDescriptions []string `json:"situationDescriptions"`
+		Strength              int      `json:"strength"`
+	} `json:"homeTeam"`
+	AwayTeam struct {
+		Abbrev   string `json:"abbrev"`
+		Strength int    `json:"strength"`
+	} `json:"awayTeam"`
+	SituationCode    string `json:"situationCode"`
+	TimeRemaining    string `json:"timeRemaining"`
+	SecondsRemaining int    `json:"secondsRemaining"`
 }

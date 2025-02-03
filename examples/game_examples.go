@@ -2,6 +2,7 @@ package examples
 
 import (
 	"fmt"
+
 	"go-nhl/internal/display"
 	"go-nhl/nhl"
 )
@@ -52,5 +53,16 @@ func GetGameDetails(client *nhl.Client, gameID int) error {
 	}
 	display.GameStory(story)
 
+	return nil
+}
+
+// GetLiveGameUpdates demonstrates retrieving live game updates
+func GetLiveGameUpdates(client *nhl.Client) error {
+	updates, err := client.GetLiveGameUpdates()
+	if err != nil {
+		return fmt.Errorf("failed to get live game updates: %w", err)
+	}
+
+	display.LiveGameUpdates(updates)
 	return nil
 }
