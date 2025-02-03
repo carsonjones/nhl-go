@@ -89,6 +89,15 @@ func (c *Client) GetPlayerStats(playerID int, isGoalie bool, reportType string, 
 		return nil, fmt.Errorf("invalid player ID: %d", playerID)
 	}
 
+	// Validate report type
+	validReportTypes := map[string]bool{
+		"regularSeason": true,
+		"playoffs":      true,
+	}
+	if !validReportTypes[reportType] {
+		return nil, fmt.Errorf("invalid report type: %s", reportType)
+	}
+
 	url := fmt.Sprintf("%s/player/%d/landing", c.baseURL, playerID)
 	if filter != nil {
 		if filter.SeasonID > 0 {

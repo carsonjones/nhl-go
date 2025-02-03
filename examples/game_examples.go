@@ -43,16 +43,6 @@ func GetGameDetails(client *nhl.Client, gameID int) error {
 	}
 	display.GamePlayByPlay(pbp)
 
-	// Get game story
-	story, err := client.GetGameStory(gameID)
-	if err != nil {
-		return fmt.Errorf("error getting game story: %v", err)
-	}
-	if story == nil {
-		return fmt.Errorf("no game story found for ID: %d", gameID)
-	}
-	display.GameStory(story)
-
 	return nil
 }
 

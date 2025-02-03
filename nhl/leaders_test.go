@@ -37,16 +37,9 @@ func TestGetStatsLeaders(t *testing.T) {
 				}
 
 				// Verify request path
-				expectedPath := fmt.Sprintf("/stats/rest/en/leaders/skaters/points?season=%d", tc.expectedSeason)
-				if r.URL.Path != "/stats/rest/en/leaders/skaters/points" {
+				expectedPath := fmt.Sprintf("/skater-stats-leaders/%d/2", tc.expectedSeason)
+				if r.URL.Path != expectedPath {
 					t.Errorf("Expected request to '%s', got '%s'", expectedPath, r.URL.Path)
-				}
-
-				// Verify season parameter
-				season := r.URL.Query().Get("season")
-				expectedSeason := fmt.Sprintf("%d", tc.expectedSeason)
-				if season != expectedSeason {
-					t.Errorf("Expected season parameter '%s', got '%s'", expectedSeason, season)
 				}
 
 				// Return mock response
@@ -90,7 +83,7 @@ func TestGetStatsLeaders(t *testing.T) {
 				t.Errorf("Expected team abbrev 'TBL', got '%s'", leaders.Points[0].TeamAbbrev)
 			}
 			if leaders.Points[0].Value != 144 {
-				t.Errorf("Expected value 144, got %d", leaders.Points[0].Value)
+				t.Errorf("Expected value 144, got %f", leaders.Points[0].Value)
 			}
 		})
 	}

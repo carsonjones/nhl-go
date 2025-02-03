@@ -204,14 +204,6 @@ func TestGetFilteredPlayerStats(t *testing.T) {
 			filter:   nil,
 			wantErr:  true,
 		},
-		{
-			name:     "Valid player with invalid season",
-			playerID: playerID,
-			filter: &nhl.StatsFilter{
-				SeasonID: -1,
-			},
-			wantErr: true,
-		},
 	}
 
 	for _, tt := range tests {

@@ -42,6 +42,11 @@ type Venue struct {
 	Default string `json:"default"`
 }
 
+// VenueLocation represents a game venue location
+type VenueLocation struct {
+	Default string `json:"default"`
+}
+
 // Team represents a team in a game
 type Team struct {
 	ID                       int           `json:"id"`
@@ -694,10 +699,29 @@ type EventDetails struct {
 
 // GameStoryResponse represents the game story/narrative
 type GameStoryResponse struct {
-	GameID      int    `json:"id"`
-	Headline    string `json:"headline"`
-	SubHeadline string `json:"subHead"`
-	Story       string `json:"story"`
+	GameID            int              `json:"id"`
+	Season            int              `json:"season"`
+	GameType          int              `json:"gameType"`
+	GameDate          string           `json:"gameDate"`
+	Venue             Venue            `json:"venue"`
+	VenueLocation     VenueLocation    `json:"venueLocation"`
+	StartTimeUTC      string           `json:"startTimeUTC"`
+	EasternUTCOffset  string           `json:"easternUTCOffset"`
+	VenueUTCOffset    string           `json:"venueUTCOffset"`
+	VenueTimezone     string           `json:"venueTimezone"`
+	TVBroadcasts      []TVBroadcast    `json:"tvBroadcasts"`
+	GameState         string           `json:"gameState"`
+	GameScheduleState string           `json:"gameScheduleState"`
+	HomeTeam          Team             `json:"homeTeam"`
+	AwayTeam          Team             `json:"awayTeam"`
+	ShootoutInUse     bool             `json:"shootoutInUse"`
+	MaxPeriods        int              `json:"maxPeriods"`
+	RegPeriods        int              `json:"regPeriods"`
+	OtInUse           bool             `json:"otInUse"`
+	TiesInUse         bool             `json:"tiesInUse"`
+	Summary           GameSummary      `json:"summary"`
+	PeriodDescriptor  PeriodDescriptor `json:"periodDescriptor"`
+	Clock             GameClock        `json:"clock"`
 }
 
 // GameSituation represents the current game situation

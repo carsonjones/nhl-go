@@ -20,6 +20,22 @@ func formatStreak(code string, count int) string {
 	return fmt.Sprintf("%s%d", code, count)
 }
 
+// SortTeams sorts teams by NHL standings rules:
+// 1. Points (descending)
+// 2. Regulation Wins (descending)
+// 3. Goal Differential (descending)
+func SortTeams(teams []nhl.StandingsTeam) {
+	sort.Slice(teams, func(i, j int) bool {
+		if teams[i].Points != teams[j].Points {
+			return teams[i].Points > teams[j].Points
+		}
+		if teams[i].RegulationWins != teams[j].RegulationWins {
+			return teams[i].RegulationWins > teams[j].RegulationWins
+		}
+		return teams[i].GoalDifferential > teams[j].GoalDifferential
+	})
+}
+
 // Standings displays the NHL standings
 func Standings(standings *nhl.StandingsResponse) {
 	// Group teams by conference and division
@@ -58,18 +74,8 @@ func Standings(standings *nhl.StandingsResponse) {
 			fmt.Printf("\n%s Division\n", div)
 			fmt.Println(strings.Repeat("-", len(div)+9))
 
-			// Sort teams by points (descending)
-			sort.Slice(teams, func(i, j int) bool {
-				if teams[i].Points != teams[j].Points {
-					return teams[i].Points > teams[j].Points
-				}
-				// If points are tied, use regulation wins as tiebreaker
-				if teams[i].RegulationWins != teams[j].RegulationWins {
-					return teams[i].RegulationWins > teams[j].RegulationWins
-				}
-				// If regulation wins are tied, use goal differential
-				return teams[i].GoalDifferential > teams[j].GoalDifferential
-			})
+			// Sort teams using the shared sorting function
+			SortTeams(teams)
 
 			// Print header
 			fmt.Printf("%-25s GP   W   L  OTL  PTS  REG  GF  GA DIFF  PTS%%  STRK  L10    HOME    AWAY\n", "Team")

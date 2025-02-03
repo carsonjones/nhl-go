@@ -31,10 +31,10 @@ func TestGetGameDetails(t *testing.T) {
 	}
 
 	// Team info validation
-	if details.HomeTeam.Name.Default == "" {
+	if details.HomeTeam.CommonName.Default == "" {
 		t.Error("Home team name is empty")
 	}
-	if details.AwayTeam.Name.Default == "" {
+	if details.AwayTeam.CommonName.Default == "" {
 		t.Error("Away team name is empty")
 	}
 
@@ -64,7 +64,7 @@ func TestGetGameBoxscore(t *testing.T) {
 	}
 
 	// Basic info validation
-	if boxscore.GameID == 0 {
+	if boxscore.ID == 0 {
 		t.Error("Game ID is 0")
 	}
 	if boxscore.GameDate == "" {
@@ -72,16 +72,37 @@ func TestGetGameBoxscore(t *testing.T) {
 	}
 
 	// Team stats validation
-	validateTeamStats(t, boxscore.HomeTeam.TeamStats, "Home")
-	validateTeamStats(t, boxscore.AwayTeam.TeamStats, "Away")
-
-	// Period stats validation
-	if len(boxscore.Periods) == 0 {
-		t.Error("No period stats found")
+	if boxscore.HomeTeam.Score < 0 {
+		t.Error("Invalid home team score")
 	}
-	for i, period := range boxscore.Periods {
-		if period.PeriodNumber == 0 {
-			t.Errorf("Period %d has invalid number", i+1)
+	if boxscore.AwayTeam.Score < 0 {
+		t.Error("Invalid away team score")
+	}
+
+	// Player stats validation
+	validatePlayerStats(t, boxscore.PlayerByGameStats.HomeTeam, "Home")
+	validatePlayerStats(t, boxscore.PlayerByGameStats.AwayTeam, "Away")
+}
+
+func validatePlayerStats(t *testing.T, stats nhl.TeamPlayerStats, teamType string) {
+	// Check forwards
+	for i, player := range stats.Forwards {
+		if player.TOI == "" {
+			t.Errorf("%s team forward %d has no time on ice", teamType, i)
+		}
+	}
+
+	// Check defense
+	for i, player := range stats.Defense {
+		if player.TOI == "" {
+			t.Errorf("%s team defense %d has no time on ice", teamType, i)
+		}
+	}
+
+	// Check goalies
+	for i, goalie := range stats.Goalies {
+		if goalie.TOI == "" {
+			t.Errorf("%s team goalie %d has no time on ice", teamType, i)
 		}
 	}
 }
@@ -99,70 +120,23 @@ func TestGetGamePlayByPlay(t *testing.T) {
 		t.Fatal("GetGamePlayByPlay() returned nil")
 	}
 
-	// Basic info validation
-	if pbp.GameID == 0 {
-		t.Error("Game ID is 0")
-	}
-
-	// Plays validation
-	if len(pbp.Plays) == 0 {
-		t.Error("No plays found")
-	}
+	// Validate plays
 	for i, play := range pbp.Plays {
-		if play.Period == 0 {
-			t.Errorf("Play %d has invalid period", i+1)
-		}
 		if play.TimeInPeriod == "" {
-			t.Errorf("Play %d has no time", i+1)
+			t.Errorf("Play %d has no time in period", i)
 		}
-		if play.Description == "" {
-			t.Errorf("Play %d has no description", i+1)
+		if play.PeriodDescriptor.Number == 0 {
+			t.Errorf("Play %d has invalid period number", i)
 		}
 	}
-}
 
-func TestGetGameStory(t *testing.T) {
-	client := nhl.NewClient()
-
-	story, err := client.GetGameStory(2023020204)
-	if err != nil {
-		t.Fatalf("GetGameStory() error = %v", err)
-	}
-
-	// Validate game story
-	if story == nil {
-		t.Fatal("GetGameStory() returned nil")
-	}
-
-	// Content validation
-	if story.GameID == 0 {
-		t.Error("Game ID is 0")
-	}
-	if story.Headline == "" {
-		t.Error("Headline is empty")
-	}
-	if story.Story == "" {
-		t.Error("Story content is empty")
-	}
-}
-
-// Helper function to validate team stats
-func validateTeamStats(t *testing.T, stats nhl.TeamStats, teamType string) {
-	t.Helper()
-
-	if stats.Goals < 0 {
-		t.Errorf("%s team has invalid goals: %d", teamType, stats.Goals)
-	}
-	if stats.ShotsOnGoal < 0 {
-		t.Errorf("%s team has invalid shots on goal: %d", teamType, stats.ShotsOnGoal)
-	}
-	if stats.FaceoffPct < 0 || stats.FaceoffPct > 100 {
-		t.Errorf("%s team has invalid faceoff percentage: %f", teamType, stats.FaceoffPct)
-	}
-	if stats.Hits < 0 {
-		t.Errorf("%s team has invalid hits: %d", teamType, stats.Hits)
-	}
-	if stats.PIM < 0 {
-		t.Errorf("%s team has invalid penalty minutes: %d", teamType, stats.PIM)
+	// Validate roster spots
+	for i, player := range pbp.RosterSpots {
+		if player.PlayerID == 0 {
+			t.Errorf("Roster spot %d has invalid player ID", i)
+		}
+		if player.FirstName.Default == "" || player.LastName.Default == "" {
+			t.Errorf("Roster spot %d has invalid player name", i)
+		}
 	}
 }

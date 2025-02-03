@@ -1,6 +1,7 @@
 package nhl_test
 
 import (
+	"go-nhl/internal/display"
 	"go-nhl/nhl"
 	"testing"
 )
@@ -148,30 +149,15 @@ func TestStandingsSorting(t *testing.T) {
 	// 3. Team B (80 points, 30 regulation wins, +25 goal diff)
 	// 4. Team A (80 points, 30 regulation wins, +20 goal diff)
 
-	// Sort teams by conference and division
-	teams := standings.Standings
-	if len(teams) != 4 {
-		t.Fatal("Wrong number of teams in test data")
-	}
+	// Sort the teams using the shared sorting function
+	display.SortTeams(standings.Standings)
 
-	// First team should be highest points
-	if teams[0].Points < teams[1].Points {
-		t.Error("Teams not sorted by points correctly")
-	}
-
-	// Check teams with equal points (teams[1], teams[2], teams[3])
-	equalPointsTeams := teams[1:4]
-	for i := 0; i < len(equalPointsTeams)-1; i++ {
-		if equalPointsTeams[i].Points == equalPointsTeams[i+1].Points {
-			// Should be sorted by regulation wins
-			if equalPointsTeams[i].RegulationWins < equalPointsTeams[i+1].RegulationWins {
-				t.Error("Teams with equal points not sorted by regulation wins correctly")
-			} else if equalPointsTeams[i].RegulationWins == equalPointsTeams[i+1].RegulationWins {
-				// If regulation wins are equal, should be sorted by goal differential
-				if equalPointsTeams[i].GoalDifferential < equalPointsTeams[i+1].GoalDifferential {
-					t.Error("Teams with equal points and regulation wins not sorted by goal differential correctly")
-				}
-			}
+	// Verify the order
+	expectedOrder := []string{"Team D", "Team C", "Team B", "Team A"}
+	for i, expected := range expectedOrder {
+		if standings.Standings[i].TeamName.Default != expected {
+			t.Errorf("Wrong team at position %d: got %s, want %s",
+				i+1, standings.Standings[i].TeamName.Default, expected)
 		}
 	}
 }

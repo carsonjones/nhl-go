@@ -432,11 +432,7 @@ func GamePlayByPlay(pbp *nhl.PlayByPlayResponse) {
 
 // GameStory displays the game story/narrative
 func GameStory(story *nhl.GameStoryResponse) {
-	fmt.Printf("\n%s\n", story.Headline)
-	if story.SubHeadline != "" {
-		fmt.Printf("%s\n", story.SubHeadline)
-	}
-	fmt.Printf("\n%s\n", story.Story)
+	fmt.Println(story)
 }
 
 // FormatAssists formats a list of assists into a readable string

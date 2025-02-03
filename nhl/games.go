@@ -39,9 +39,12 @@ func (c *Client) GetGamePlayByPlay(gameID int) (*PlayByPlayResponse, error) {
 
 // GetGameStory returns the game story/narrative for a specific game
 func (c *Client) GetGameStory(gameID int) (*GameStoryResponse, error) {
+	fmt.Println(c.baseURL)
+	fmt.Println(gameID)
 	url := fmt.Sprintf("%s/wsc/game-story/%d", c.baseURL, gameID)
 	var response GameStoryResponse
 	err := c.get(url, &response)
+	fmt.Println(response)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get game story: %v", err)
 	}
