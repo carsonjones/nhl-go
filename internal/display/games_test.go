@@ -2,7 +2,7 @@ package display_test
 
 import (
 	"go-nhl/internal/display"
-	"go-nhl/nhl"
+	"go-nhl/client"
 	"testing"
 )
 

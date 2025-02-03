@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"go-nhl/internal/formatters"
-	"go-nhl/nhl"
+	"go-nhl/client"
 	"io"
 	"os"
 	"strings"

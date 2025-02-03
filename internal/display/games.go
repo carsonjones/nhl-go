@@ -3,7 +3,7 @@ package display
 import (
 	"fmt"
 	"go-nhl/internal/formatters"
-	"go-nhl/nhl"
+	"go-nhl/client"
 	"sort"
 	"strings"
 	"time"

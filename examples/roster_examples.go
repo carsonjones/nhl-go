@@ -3,7 +3,7 @@ package examples
 import (
 	"fmt"
 	"go-nhl/internal/display"
-	"go-nhl/nhl"
+	"go-nhl/client"
 	"strings"
 )
 

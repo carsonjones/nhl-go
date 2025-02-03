@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"go-nhl/internal/display"
-	"go-nhl/nhl"
+	"go-nhl/client"
 )
 
 // GetGameDetails demonstrates retrieving and displaying detailed game information

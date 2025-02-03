@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go-nhl/internal/display"
 	"go-nhl/internal/formatters"
-	"go-nhl/nhl"
+	"go-nhl/client"
 	"time"
 )
 

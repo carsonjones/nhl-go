@@ -2,7 +2,7 @@ package display
 
 import (
 	"fmt"
-	"go-nhl/nhl"
+	"go-nhl/client"
 )
 
 // Roster displays a team's roster
