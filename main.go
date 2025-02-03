@@ -12,6 +12,7 @@ import (
 func main() {
 	// Command line flags
 	var (
+		// Flags
 		todaysSchedule      bool
 		slate               bool
 		roster              bool
@@ -28,8 +29,11 @@ func main() {
 		gameDetails         bool
 		liveUpdates         bool
 		leaders             bool
-		gameID              int
-		updateInterval      int
+		// Parameters
+		date           string
+		name           string
+		gameID         int
+		updateInterval int
 	)
 
 	flag.BoolVar(&todaysSchedule, "today", false, "Get today's NHL schedule")
@@ -47,9 +51,14 @@ func main() {
 	flag.BoolVar(&divisionStandings, "division", false, "Get standings by division")
 	flag.BoolVar(&gameDetails, "game", false, "Get detailed game information")
 	flag.BoolVar(&leaders, "leaders", false, "Get NHL league leaders")
-	flag.IntVar(&gameID, "game-id", 2024020750, "Game ID for game details (default: NYR vs CHI on Feb 9, 2024)")
 	flag.BoolVar(&liveUpdates, "live", false, "Show live game updates")
+
+	// Parameters
+	flag.IntVar(&gameID, "game-id", 2024020750, "Game ID for game details (default: NYR vs CHI on Feb 9, 2024)")
 	flag.IntVar(&updateInterval, "interval", 60, "Update interval in seconds for live updates")
+	flag.StringVar(&date, "date", "", "Date to get schedule for (format: YYYY-MM-DD)")
+	flag.StringVar(&name, "name", "", "Team name for roster, schedule, and standings")
+
 	flag.Parse()
 
 	// Create NHL client
@@ -67,7 +76,11 @@ func main() {
 
 	if slate {
 		examplesRun = true
-		if err := examples.GetScheduleByDate(client, "2025-02-01"); err != nil {
+		slateDate := date
+		if slateDate == "" {
+			slateDate = time.Now().Format("2006-01-02")
+		}
+		if err := examples.GetScheduleByDate(client, slateDate); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -81,35 +94,55 @@ func main() {
 
 	if playerSearch {
 		examplesRun = true
-		if err := examples.SearchPlayer(client, "Robertson"); err != nil {
+		playerName := name
+		if playerName == "" {
+			playerName = "Robertson"
+		}
+		if err := examples.SearchPlayer(client, playerName); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	if skaterSearch {
 		examplesRun = true
-		if err := examples.SearchSkater(client, "Hintz"); err != nil {
+		skaterName := name
+		if skaterName == "" {
+			skaterName = "Hintz"
+		}
+		if err := examples.SearchSkater(client, skaterName); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	if goalieSearch {
 		examplesRun = true
-		if err := examples.SearchGoalie(client, "Oettinger"); err != nil {
+		goalieName := name
+		if goalieName == "" {
+			goalieName = "Oettinger"
+		}
+		if err := examples.SearchGoalie(client, goalieName); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	if stats {
 		examplesRun = true
-		if err := examples.GetSeasonStats(client, "Johnston"); err != nil {
+		playerName := name
+		if playerName == "" {
+			playerName = "Johnston"
+		}
+		if err := examples.GetSeasonStats(client, playerName); err != nil {
 			log.Fatal(err)
 		}
 	}
 
 	if schedule {
 		examplesRun = true
-		if err := examples.GetTeamSchedule(client, "DAL"); err != nil {
+		teamName := name
+		if teamName == "" {
+			teamName = "DAL"
+		}
+		if err := examples.GetTeamSchedule(client, teamName); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -123,7 +156,11 @@ func main() {
 
 	if standingsByDate {
 		examplesRun = true
-		if err := examples.GetStandingsByDate(client, "2024-02-01"); err != nil {
+		standingsDate := date
+		if standingsDate == "" {
+			standingsDate = time.Now().Format("2006-01-02")
+		}
+		if err := examples.GetStandingsByDate(client, standingsDate); err != nil {
 			log.Fatal(err)
 		}
 	}
