@@ -57,9 +57,8 @@
 ## Priority Queue
 
 ### High Priority
-1. Team History and Head-to-Head Records
-2. League Leaders - Important for player performance context
-3. Player Game Logs - Detailed player performance tracking
+1. League Leaders - Important for player performance context
+2. Player Game Logs - Detailed player performance tracking
 
 ### Medium Priority
 1. Team Trends - Performance analysis over time
