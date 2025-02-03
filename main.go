@@ -12,43 +12,43 @@ import (
 func main() {
 	// Command line flags
 	var (
-		exampleGetCurrentSchedule  bool
-		exampleGetScheduleByDate   bool
-		exampleGetRoster           bool
-		examplePlayerSearch        bool
-		exampleSkaterSearch        bool
-		exampleGoalieSearch        bool
-		exampleSeasonStats         bool
-		exampleTeamSchedule        bool
-		exampleCurrentStandings    bool
-		exampleStandingsByDate     bool
-		exampleLeagueStandings     bool
-		exampleConferenceStandings bool
-		exampleDivisionStandings   bool
-		exampleGameDetails         bool
-		exampleLiveUpdates         bool
-		exampleLeagueLeaders       bool
-		gameID                     int
-		updateInterval             int
+		todaysSchedule      bool
+		slate               bool
+		roster              bool
+		playerSearch        bool
+		skaterSearch        bool
+		goalieSearch        bool
+		stats               bool
+		schedule            bool
+		standings           bool
+		standingsByDate     bool
+		leagueStandings     bool
+		conferenceStandings bool
+		divisionStandings   bool
+		gameDetails         bool
+		liveUpdates         bool
+		leaders             bool
+		gameID              int
+		updateInterval      int
 	)
 
-	flag.BoolVar(&exampleGetCurrentSchedule, "current-schedule", false, "Get today's NHL schedule")
-	flag.BoolVar(&exampleGetScheduleByDate, "schedule-by-date", false, "Get schedule for a specific date")
-	flag.BoolVar(&exampleGetRoster, "get-roster", false, "Get team rosters")
-	flag.BoolVar(&examplePlayerSearch, "player-search", false, "Search for any player")
-	flag.BoolVar(&exampleSkaterSearch, "skater-search", false, "Search for skaters with detailed stats")
-	flag.BoolVar(&exampleGoalieSearch, "goalie-search", false, "Search for goalies with detailed stats")
-	flag.BoolVar(&exampleSeasonStats, "season-stats", false, "Get player stats across seasons")
-	flag.BoolVar(&exampleTeamSchedule, "team-schedule", false, "Get a team's full schedule")
-	flag.BoolVar(&exampleCurrentStandings, "current-standings", false, "Get current NHL standings")
-	flag.BoolVar(&exampleStandingsByDate, "standings-by-date", false, "Get NHL standings for a specific date")
-	flag.BoolVar(&exampleLeagueStandings, "league-standings", false, "Get overall NHL standings")
-	flag.BoolVar(&exampleConferenceStandings, "conference", false, "Get standings by conference")
-	flag.BoolVar(&exampleDivisionStandings, "division", false, "Get standings by division")
-	flag.BoolVar(&exampleGameDetails, "game", false, "Get detailed game information")
-	flag.BoolVar(&exampleLeagueLeaders, "leaders", false, "Get NHL league leaders")
+	flag.BoolVar(&todaysSchedule, "today", false, "Get today's NHL schedule")
+	flag.BoolVar(&slate, "slate", false, "Get schedule for a specific date")
+	flag.BoolVar(&roster, "roster", false, "Get team rosters")
+	flag.BoolVar(&playerSearch, "player", false, "Search for any player")
+	flag.BoolVar(&skaterSearch, "skater", false, "Search for skaters with detailed stats")
+	flag.BoolVar(&goalieSearch, "goalie", false, "Search for goalies with detailed stats")
+	flag.BoolVar(&stats, "stats", false, "Get player stats across seasons")
+	flag.BoolVar(&schedule, "schedule", false, "Get a team's full schedule")
+	flag.BoolVar(&standings, "standings", false, "Get current NHL standings")
+	flag.BoolVar(&standingsByDate, "standings-by-date", false, "Get NHL standings for a specific date")
+	flag.BoolVar(&leagueStandings, "league-standings", false, "Get overall NHL standings")
+	flag.BoolVar(&conferenceStandings, "conference", false, "Get standings by conference")
+	flag.BoolVar(&divisionStandings, "division", false, "Get standings by division")
+	flag.BoolVar(&gameDetails, "game", false, "Get detailed game information")
+	flag.BoolVar(&leaders, "leaders", false, "Get NHL league leaders")
 	flag.IntVar(&gameID, "game-id", 2024020750, "Game ID for game details (default: NYR vs CHI on Feb 9, 2024)")
-	flag.BoolVar(&exampleLiveUpdates, "live", false, "Show live game updates")
+	flag.BoolVar(&liveUpdates, "live", false, "Show live game updates")
 	flag.IntVar(&updateInterval, "interval", 60, "Update interval in seconds for live updates")
 	flag.Parse()
 
@@ -58,112 +58,112 @@ func main() {
 	// Track if any examples were run
 	examplesRun := false
 
-	if exampleGetCurrentSchedule {
+	if todaysSchedule {
 		examplesRun = true
-		if err := examples.GetCurrentSchedule(client); err != nil {
+		if err := examples.GetTodaysSchedule(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleGetScheduleByDate {
+	if slate {
 		examplesRun = true
 		if err := examples.GetScheduleByDate(client, "2025-02-01"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleGetRoster {
+	if roster {
 		examplesRun = true
 		if err := examples.GetTeamRoster(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if examplePlayerSearch {
+	if playerSearch {
 		examplesRun = true
 		if err := examples.SearchPlayer(client, "Robertson"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleSkaterSearch {
+	if skaterSearch {
 		examplesRun = true
 		if err := examples.SearchSkater(client, "Hintz"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleGoalieSearch {
+	if goalieSearch {
 		examplesRun = true
 		if err := examples.SearchGoalie(client, "Oettinger"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleSeasonStats {
+	if stats {
 		examplesRun = true
 		if err := examples.GetSeasonStats(client, "Johnston"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleTeamSchedule {
+	if schedule {
 		examplesRun = true
 		if err := examples.GetTeamSchedule(client, "DAL"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleCurrentStandings {
+	if standings {
 		examplesRun = true
 		if err := examples.GetCurrentStandings(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleStandingsByDate {
+	if standingsByDate {
 		examplesRun = true
 		if err := examples.GetStandingsByDate(client, "2024-02-01"); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleLeagueStandings {
+	if leagueStandings {
 		examplesRun = true
 		if err := examples.GetLeagueStandings(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleConferenceStandings {
+	if conferenceStandings {
 		examplesRun = true
 		if err := examples.GetConferenceStandings(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleDivisionStandings {
+	if divisionStandings {
 		examplesRun = true
 		if err := examples.GetDivisionStandings(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleGameDetails {
+	if gameDetails {
 		examplesRun = true
 		if err := examples.GetGameDetails(client, gameID); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleLeagueLeaders {
+	if leaders {
 		examplesRun = true
 		if err := examples.GetLeagueLeaders(client); err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	if exampleLiveUpdates {
+	if liveUpdates {
 		examplesRun = true
 		fmt.Printf("Starting live game updates (refreshing every %d seconds). Press Ctrl+C to stop.\n", updateInterval)
 		for {

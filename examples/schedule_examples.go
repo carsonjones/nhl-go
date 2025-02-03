@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-// GetCurrentSchedule demonstrates retrieving and displaying the current day's schedule
-func GetCurrentSchedule(client *nhl.Client) error {
+// GetTodaysSchedule demonstrates retrieving and displaying the current day's schedule
+func GetTodaysSchedule(client *nhl.Client) error {
 	// Get today's schedule with default sort (ascending - earliest games first)
 	scores, err := client.GetCurrentSchedule()
 	if err != nil {
