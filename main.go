@@ -27,6 +27,7 @@ func main() {
 		exampleDivisionStandings   bool
 		exampleGameDetails         bool
 		exampleLiveUpdates         bool
+		exampleLeagueLeaders       bool
 		gameID                     int
 		updateInterval             int
 	)
@@ -45,6 +46,7 @@ func main() {
 	flag.BoolVar(&exampleConferenceStandings, "conference", false, "Get standings by conference")
 	flag.BoolVar(&exampleDivisionStandings, "division", false, "Get standings by division")
 	flag.BoolVar(&exampleGameDetails, "game", false, "Get detailed game information")
+	flag.BoolVar(&exampleLeagueLeaders, "leaders", false, "Get NHL league leaders")
 	flag.IntVar(&gameID, "game-id", 2024020750, "Game ID for game details (default: NYR vs CHI on Feb 9, 2024)")
 	flag.BoolVar(&exampleLiveUpdates, "live", false, "Show live game updates")
 	flag.IntVar(&updateInterval, "interval", 60, "Update interval in seconds for live updates")
@@ -154,6 +156,13 @@ func main() {
 		}
 	}
 
+	if exampleLeagueLeaders {
+		examplesRun = true
+		if err := examples.GetLeagueLeaders(client); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	if exampleLiveUpdates {
 		examplesRun = true
 		fmt.Printf("Starting live game updates (refreshing every %d seconds). Press Ctrl+C to stop.\n", updateInterval)
@@ -182,5 +191,6 @@ func main() {
 		fmt.Println("- division: Get standings by division")
 		fmt.Println("- game: Get detailed game information")
 		fmt.Println("- live: Show live game updates")
+		fmt.Println("- leaders: Get NHL league leaders")
 	}
 }

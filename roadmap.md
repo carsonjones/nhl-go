@@ -40,7 +40,7 @@
 ### League Information
 - [ ] Get League Schedule (Key Dates)
 - [ ] Get Draft Information
-- [ ] Get League Leaders
+- [x] Get League Leaders
 - [ ] Get League Records
 - [ ] Get Historical Data
 - [ ] Get Recent Transactions
@@ -57,8 +57,7 @@
 ## Priority Queue
 
 ### High Priority
-1. League Leaders - Important for player performance context
-2. Player Game Logs - Detailed player performance tracking
+1. Player Game Logs - Detailed player performance tracking
 
 ### Medium Priority
 1. Team Trends - Performance analysis over time
@@ -80,13 +79,12 @@
 - Player endpoint: `/player`
 - Team endpoint: `/team`
 - Game endpoint: `/gamecenter`
+- Stats endpoint: `/stats/rest/en/leaders`
 
 ### Data Models
 - Need to implement models for:
   - Advanced Stats
   - Historical Data
-  - League Leaders
-  - Live Updates
 
 ### Future Considerations
 - Caching strategy for frequently accessed data
