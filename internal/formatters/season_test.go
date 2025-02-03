@@ -1,7 +1,6 @@
-package main
+package formatters
 
 import (
-	"go-nhl/internal/formatters"
 	"testing"
 	"time"
 )
@@ -29,7 +28,7 @@ func TestFormatGameTime(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := formatters.FormatGameTime(tt.utcTime)
+			got, err := FormatGameTime(tt.utcTime)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FormatGameTime() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -61,7 +60,7 @@ func TestFormatSeasonID(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatters.FormatSeasonID(tt.seasonID); got != tt.want {
+			if got := FormatSeasonID(tt.seasonID); got != tt.want {
 				t.Errorf("FormatSeasonID() = %v, want %v", got, tt.want)
 			}
 		})
@@ -93,7 +92,7 @@ func TestFormatTimeOnIce(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := formatters.FormatTimeOnIce(tt.seconds); got != tt.want {
+			if got := FormatTimeOnIce(tt.seconds); got != tt.want {
 				t.Errorf("FormatTimeOnIce() = %v, want %v", got, tt.want)
 			}
 		})
@@ -108,7 +107,7 @@ func TestGetCurrentSeasonID(t *testing.T) {
 	}
 	want := year*10000 + (year + 1)
 
-	if got := formatters.GetCurrentSeasonID(); got != want {
+	if got := GetCurrentSeasonID(); got != want {
 		t.Errorf("GetCurrentSeasonID() = %v, want %v", got, want)
 	}
 }
