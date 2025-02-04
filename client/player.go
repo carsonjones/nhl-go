@@ -30,8 +30,10 @@ func (c *Client) SearchPlayer(name string) ([]PlayerSearchResult, error) {
 
 		// Helper function to check if a player matches the search
 		matchesSearch := func(player PlayerInfo) bool {
+			fullName := strings.ToLower(player.FirstName.Default + " " + player.LastName.Default)
 			return strings.Contains(strings.ToLower(player.FirstName.Default), name) ||
-				strings.Contains(strings.ToLower(player.LastName.Default), name)
+				strings.Contains(strings.ToLower(player.LastName.Default), name) ||
+				strings.Contains(fullName, name)
 		}
 
 		// Check forwards

@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	nhl "go-nhl/client"
 	"go-nhl/internal/display"
 	"go-nhl/internal/formatters"
-	"go-nhl/client"
 	"sort"
 	"strings"
 	"time"

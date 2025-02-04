@@ -3,7 +3,8 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"go-nhl/client"
+	nhl "go-nhl/client"
+	"go-nhl/mcp/server"
 	"log"
 	"time"
 )
@@ -72,6 +73,14 @@ func (c *Config) ParseFlags() {
 }
 
 func (c *Config) Execute() error {
+	// Check for subcommands first
+	if len(flag.Args()) > 0 {
+		switch flag.Arg(0) {
+		case "mcp":
+			return server.Start()
+		}
+	}
+
 	commandsRun := false
 
 	if c.TodaysSchedule {
@@ -243,4 +252,5 @@ func (c *Config) PrintUsage() {
 	fmt.Println("- game: Get detailed game information")
 	fmt.Println("- live: Show live game updates")
 	fmt.Println("- leaders: Get NHL league leaders")
+	fmt.Println("- mcp: Start the MCP server")
 }
