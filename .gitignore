@@ -13,3 +13,5 @@ build/
 go.work
 go.work.sum
 spec.md
+nhl
+nhl-mcp
