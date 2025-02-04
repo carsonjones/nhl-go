@@ -25,12 +25,12 @@ See [roadmap.md](roadmap.md) for more details.
 See [/examples](examples) for usage.
 
 ```
-./nhl -player -name "Miro
+./nhl -player -name "Miro Heiskanen"
 ```
     
 ## NHL MCP Server
 
-Exposes NHL API data via the [Model Context Protocol](https://www.anthropic.com/news/model-context-protocol), allowing for easy integration with any LLMs.
+Exposes NHL API data via the [Model Context Protocol](https://www.anthropic.com/news/model-context-protocol), allowing for easy integration with LLMs.
 
 ### Installation
 
