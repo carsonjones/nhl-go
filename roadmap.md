@@ -1,6 +1,8 @@
-# NHL API Client Roadmap
+# NHL Go Roadmap
 
-## Current Features
+__contributions welcome!__
+
+## Features
 
 ### Schedule and Scores
 - [x] Get Current Day's Schedule
@@ -71,22 +73,7 @@
 3. News/Updates - Supplementary information
 4. Injury Reports - Player availability
 
-## Implementation Notes
-
-### API Endpoints
-- Base URL: `https://api-web.nhle.com/v1`
-- Schedule endpoint: `/schedule`
-- Player endpoint: `/player`
-- Team endpoint: `/team`
-- Game endpoint: `/gamecenter`
-- Stats endpoint: `/stats/rest/en/leaders`
-
-### Data Models
-- Need to implement models for:
-  - Advanced Stats
-  - Historical Data
-
-### Future Considerations
+## Future Considerations
 - Caching strategy for frequently accessed data
 - Rate limiting implementation
 - Error handling improvements
