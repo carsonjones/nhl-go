@@ -36,6 +36,12 @@ Exposes NHL API data via the [Model Context Protocol](https://www.anthropic.com/
 
 ### Installation
 
+Build the `nhl-mcp` binary:
+
+```bash
+cd ./mcp && go build -o nhl-mcp
+```
+
 Add path to the `nhl-mcp` binary to your `claude_desktop_config.json` file:
 
 ```
