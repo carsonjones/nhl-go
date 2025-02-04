@@ -1,8 +1,6 @@
 # NHL Go
 
-<div align="center">
-<strong>An unofficial collection of NHL data tools, written in Go 🏒</strong>
-</div>
+**An unofficial collection of NHL data tools, written in Go 🏒**
 
 ## Features
 - [API Client](#nhl-api-client)
