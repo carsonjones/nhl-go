@@ -209,4 +209,31 @@ var (
 		}
 		return mcp.NewToolResultText(string(jsonData)), nil
 	}
+
+	LeadersHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		client := nhl.NewClient()
+
+		var seasonID int
+		if seasonIDArg, ok := request.Params.Arguments["seasonID"]; ok && seasonIDArg != nil {
+			seasonID, ok = seasonIDArg.(int)
+			if !ok {
+				return nil, fmt.Errorf("if provided, seasonID must be an integer")
+			}
+		}
+
+		if seasonID == 0 {
+			seasonID = formatters.GetCurrentSeasonID()
+		}
+
+		result, err := client.GetStatsLeaders(seasonID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting leaders: %v", err)
+		}
+
+		jsonData, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling response: %v", err)
+		}
+		return mcp.NewToolResultText(string(jsonData)), nil
+	}
 )

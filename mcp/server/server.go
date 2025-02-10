@@ -13,7 +13,7 @@ func Start() error {
 		server.WithLogging(),
 	)
 
-	slateTool := mcp.NewTool("slate",
+	slateTool := mcp.NewTool("nhl-slate",
 		mcp.WithDescription("Get slate of games for a given date"),
 		mcp.WithString("date",
 			mcp.Required(),
@@ -21,7 +21,7 @@ func Start() error {
 		),
 	)
 
-	playerTool := mcp.NewTool("player",
+	playerTool := mcp.NewTool("nhl-player",
 		mcp.WithDescription("Get player info and stats"),
 		mcp.WithString("name",
 			mcp.Required(),
@@ -29,7 +29,7 @@ func Start() error {
 		),
 	)
 
-	standingsTool := mcp.NewTool("standings",
+	standingsTool := mcp.NewTool("nhl-standings",
 		mcp.WithDescription("Get standings"),
 		mcp.WithString("date",
 			mcp.Description("Date (YYYY-MM-DD format)"),
@@ -40,7 +40,7 @@ func Start() error {
 		),
 	)
 
-	rosterTool := mcp.NewTool("roster",
+	rosterTool := mcp.NewTool("nhl-roster",
 		mcp.WithDescription("Get team roster"),
 		mcp.WithString("team",
 			mcp.Required(),
@@ -48,7 +48,7 @@ func Start() error {
 		),
 	)
 
-	scheduleTool := mcp.NewTool("schedule",
+	scheduleTool := mcp.NewTool("nhl-schedule",
 		mcp.WithDescription("Get team schedule"),
 		mcp.WithString("team",
 			mcp.Required(),
@@ -59,11 +59,22 @@ func Start() error {
 		),
 	)
 
+	leadersTool := mcp.NewTool("nhl-leaders",
+		mcp.WithDescription("Get leaders"),
+		// mcp.WithString("type",
+		// 	mcp.Description("Leader type (points, goals, assists, etc.)"),
+		// ),
+		mcp.WithString("seasonID",
+			mcp.Description("Season ID (example: 20242025)"),
+		),
+	)
+
 	s.AddTool(slateTool, SlateHandler)
 	s.AddTool(playerTool, PlayerHandler)
 	s.AddTool(standingsTool, StandingsHandler)
 	s.AddTool(rosterTool, RosterHandler)
 	s.AddTool(scheduleTool, ScheduleHandler)
+	s.AddTool(leadersTool, LeadersHandler)
 
 	// Start the stdio server
 	return server.ServeStdio(s)
