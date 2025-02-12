@@ -211,6 +211,7 @@ var (
 	}
 
 	LeadersHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		// TODO: broken
 		client := nhl.NewClient()
 
 		var seasonID int
