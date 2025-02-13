@@ -1,5 +1,7 @@
 package cmd
 
+// todo: rename to nhl-cli ?
+
 import (
 	"flag"
 	"fmt"
