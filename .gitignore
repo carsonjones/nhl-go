@@ -15,5 +15,7 @@ go.work.sum
 spec.md
 nhl
 nhl-mcp
+nhl-cli
+nhl-worker
 .DS_Store
 spec.md

@@ -10,9 +10,9 @@ test:
 build-mcp:
 	cd mcp && go build -o ../nhl-mcp && cd ../
 
-.PHONY: build-nhl
-build-nhl:
-	go build -o nhl
+.PHONY: build-cli
+build-cli:
+	go build -o nhl-cli
 
 .PHONY: build
-build: build-mcp build-nhl
+build: build-mcp build-cli
