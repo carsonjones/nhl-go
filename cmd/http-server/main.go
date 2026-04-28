@@ -114,7 +114,13 @@ func main() {
 	s.AddTool(liveTool, nhlserver.LiveHandler)
 	s.AddTool(teamsTool, nhlserver.TeamsHandler)
 
-	// Create SSE server
+	// Create Streamable HTTP server (newer MCP transport)
+	httpServer := server.NewStreamableHTTPServer(s,
+		server.WithEndpointPath("/mcp"),
+		server.WithStateLess(true),
+	)
+
+	// Also create SSE server for backwards compatibility
 	sseServer := server.NewSSEServer(s,
 		server.WithBaseURL(baseURL),
 		server.WithSSEEndpoint("/sse"),
@@ -124,15 +130,12 @@ func main() {
 	// Create mux for multiple endpoints
 	mux := http.NewServeMux()
 
-	// SSE endpoints
+	// Streamable HTTP endpoint (preferred for Claude)
+	mux.Handle("/mcp", httpServer)
+
+	// SSE endpoints (backwards compatibility)
 	mux.Handle("/sse", sseServer)
 	mux.Handle("/message", sseServer)
-
-	// Also support /mcp as SSE endpoint (rewrite path)
-	mux.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
-		r.URL.Path = "/sse"
-		sseServer.ServeHTTP(w, r)
-	})
 
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -143,18 +146,18 @@ func main() {
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
-		
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Mcp-Session-Id")
+
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-		
+
 		mux.ServeHTTP(w, r)
 	})
 
-	log.Printf("NHL MCP SSE server listening on %s", addr)
+	log.Printf("NHL MCP server listening on %s", addr)
+	log.Printf("Streamable HTTP endpoint: %s/mcp", baseURL)
 	log.Printf("SSE endpoint: %s/sse", baseURL)
-	log.Printf("Message endpoint: %s/message", baseURL)
 	log.Fatal(http.ListenAndServe(addr, corsHandler))
 }

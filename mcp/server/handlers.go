@@ -17,7 +17,7 @@ var (
 		client := nhl.NewClient()
 
 		var date string
-		if dateArg, ok := request.Params.Arguments["date"]; ok && dateArg != nil {
+		if dateArg, ok := request.GetArguments()["date"]; ok && dateArg != nil {
 			date, ok = dateArg.(string)
 			if !ok {
 				return nil, fmt.Errorf("if provided, date must be a string in YYYY-MM-DD format")
@@ -42,7 +42,7 @@ var (
 	PlayerHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		client := nhl.NewClient()
 
-		nameArg, ok := request.Params.Arguments["name"]
+		nameArg, ok := request.GetArguments()["name"]
 		if !ok || nameArg == nil {
 			return nil, fmt.Errorf("name parameter is required")
 		}
@@ -87,7 +87,7 @@ var (
 		client := nhl.NewClient()
 
 		var date string
-		if dateArg, ok := request.Params.Arguments["date"]; ok && dateArg != nil {
+		if dateArg, ok := request.GetArguments()["date"]; ok && dateArg != nil {
 			date, ok = dateArg.(string)
 			if !ok {
 				return nil, fmt.Errorf("if provided, date must be a string in YYYY-MM-DD format")
@@ -95,7 +95,7 @@ var (
 		}
 
 		var typ string
-		if typeArg, ok := request.Params.Arguments["type"]; ok && typeArg != nil {
+		if typeArg, ok := request.GetArguments()["type"]; ok && typeArg != nil {
 			typ, ok = typeArg.(string)
 			if !ok {
 				return nil, fmt.Errorf("if provided, type must be one of: conference, division, league")
@@ -146,7 +146,7 @@ var (
 	RosterHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		client := nhl.NewClient()
 
-		teamArg, ok := request.Params.Arguments["team"]
+		teamArg, ok := request.GetArguments()["team"]
 		if !ok || teamArg == nil {
 			return nil, fmt.Errorf("team parameter is required")
 		}
@@ -171,7 +171,7 @@ var (
 	ScheduleHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		client := nhl.NewClient()
 
-		teamArg, ok := request.Params.Arguments["team"]
+		teamArg, ok := request.GetArguments()["team"]
 		if !ok || teamArg == nil {
 			return nil, fmt.Errorf("team parameter is required")
 		}
@@ -182,7 +182,7 @@ var (
 		}
 
 		var seasonID int
-		if seasonIDArg, ok := request.Params.Arguments["seasonID"]; ok && seasonIDArg != nil {
+		if seasonIDArg, ok := request.GetArguments()["seasonID"]; ok && seasonIDArg != nil {
 			seasonID, ok = seasonIDArg.(int)
 			if !ok {
 				return nil, fmt.Errorf("if provided, seasonID must be an integer")
@@ -215,7 +215,7 @@ var (
 		client := nhl.NewClient()
 
 		var seasonID int
-		if seasonIDArg, ok := request.Params.Arguments["seasonID"]; ok && seasonIDArg != nil {
+		if seasonIDArg, ok := request.GetArguments()["seasonID"]; ok && seasonIDArg != nil {
 			seasonID, ok = seasonIDArg.(int)
 			if !ok {
 				return nil, fmt.Errorf("if provided, seasonID must be an integer")
@@ -241,7 +241,7 @@ var (
 	GameHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		client := nhl.NewClient()
 
-		gameIDArg, ok := request.Params.Arguments["gameId"]
+		gameIDArg, ok := request.GetArguments()["gameId"]
 		if !ok || gameIDArg == nil {
 			return nil, fmt.Errorf("gameId parameter is required")
 		}
@@ -257,7 +257,7 @@ var (
 		}
 
 		include := "details"
-		if includeArg, ok := request.Params.Arguments["include"]; ok && includeArg != nil {
+		if includeArg, ok := request.GetArguments()["include"]; ok && includeArg != nil {
 			if s, ok := includeArg.(string); ok {
 				include = s
 			}
