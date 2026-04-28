@@ -237,4 +237,112 @@ var (
 		}
 		return mcp.NewToolResultText(string(jsonData)), nil
 	}
+
+	GameHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		client := nhl.NewClient()
+
+		gameIDArg, ok := request.Params.Arguments["gameId"]
+		if !ok || gameIDArg == nil {
+			return nil, fmt.Errorf("gameId parameter is required")
+		}
+
+		var gameID int
+		switch v := gameIDArg.(type) {
+		case float64:
+			gameID = int(v)
+		case int:
+			gameID = v
+		default:
+			return nil, fmt.Errorf("gameId must be a number")
+		}
+
+		include := "details"
+		if includeArg, ok := request.Params.Arguments["include"]; ok && includeArg != nil {
+			if s, ok := includeArg.(string); ok {
+				include = s
+			}
+		}
+
+		response := make(map[string]interface{})
+
+		switch include {
+		case "all":
+			details, err := client.GetGameDetails(gameID)
+			if err == nil {
+				response["details"] = details
+			}
+			boxscore, err := client.GetGameBoxscore(gameID)
+			if err == nil {
+				response["boxscore"] = boxscore
+			}
+			plays, err := client.GetGamePlayByPlay(gameID)
+			if err == nil {
+				response["plays"] = plays
+			}
+			story, err := client.GetGameStory(gameID)
+			if err == nil {
+				response["story"] = story
+			}
+		case "boxscore":
+			boxscore, err := client.GetGameBoxscore(gameID)
+			if err != nil {
+				return nil, fmt.Errorf("error getting boxscore: %v", err)
+			}
+			response["boxscore"] = boxscore
+		case "plays":
+			plays, err := client.GetGamePlayByPlay(gameID)
+			if err != nil {
+				return nil, fmt.Errorf("error getting play-by-play: %v", err)
+			}
+			response["plays"] = plays
+		case "story":
+			story, err := client.GetGameStory(gameID)
+			if err != nil {
+				return nil, fmt.Errorf("error getting game story: %v", err)
+			}
+			response["story"] = story
+		default: // "details"
+			details, err := client.GetGameDetails(gameID)
+			if err != nil {
+				return nil, fmt.Errorf("error getting game details: %v", err)
+			}
+			response["details"] = details
+		}
+
+		jsonData, err := json.MarshalIndent(response, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling response: %v", err)
+		}
+		return mcp.NewToolResultText(string(jsonData)), nil
+	}
+
+	LiveHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		client := nhl.NewClient()
+
+		result, err := client.GetLiveGameUpdates()
+		if err != nil {
+			return nil, fmt.Errorf("error getting live updates: %v", err)
+		}
+
+		jsonData, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling response: %v", err)
+		}
+		return mcp.NewToolResultText(string(jsonData)), nil
+	}
+
+	TeamsHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		client := nhl.NewClient()
+
+		result, err := client.GetTeams()
+		if err != nil {
+			return nil, fmt.Errorf("error getting teams: %v", err)
+		}
+
+		jsonData, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling response: %v", err)
+		}
+		return mcp.NewToolResultText(string(jsonData)), nil
+	}
 )

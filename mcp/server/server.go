@@ -69,12 +69,35 @@ func Start() error {
 		),
 	)
 
+	gameTool := mcp.NewTool("nhl-game",
+		mcp.WithDescription("Get detailed game information including boxscore, play-by-play, and game story"),
+		mcp.WithNumber("gameId",
+			mcp.Required(),
+			mcp.Description("Game ID"),
+		),
+		mcp.WithString("include",
+			mcp.Description("What to include: details, boxscore, plays, story, or all (default: details)"),
+			mcp.DefaultString("details"),
+		),
+	)
+
+	liveTool := mcp.NewTool("nhl-live",
+		mcp.WithDescription("Get live game updates and current scoreboard"),
+	)
+
+	teamsTool := mcp.NewTool("nhl-teams",
+		mcp.WithDescription("Get list of all NHL teams"),
+	)
+
 	s.AddTool(slateTool, SlateHandler)
 	s.AddTool(playerTool, PlayerHandler)
 	s.AddTool(standingsTool, StandingsHandler)
 	s.AddTool(rosterTool, RosterHandler)
 	s.AddTool(scheduleTool, ScheduleHandler)
 	s.AddTool(leadersTool, LeadersHandler)
+	s.AddTool(gameTool, GameHandler)
+	s.AddTool(liveTool, LiveHandler)
+	s.AddTool(teamsTool, TeamsHandler)
 
 	// Start the stdio server
 	return server.ServeStdio(s)
