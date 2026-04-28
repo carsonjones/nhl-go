@@ -451,15 +451,22 @@ type AssistEvent struct {
 	SweaterNumber int           `json:"sweaterNumber"`
 }
 
+// PenaltyPlayerInfo represents a player involved in a penalty
+type PenaltyPlayerInfo struct {
+	FirstName     LanguageNames `json:"firstName"`
+	LastName      LanguageNames `json:"lastName"`
+	SweaterNumber int           `json:"sweaterNumber"`
+}
+
 // PenaltyEvent represents a penalty called in the game
 type PenaltyEvent struct {
-	TimeInPeriod      string        `json:"timeInPeriod"`
-	Type              string        `json:"type"`
-	Duration          int           `json:"duration"`
-	CommittedByPlayer string        `json:"committedByPlayer"`
-	TeamAbbrev        LanguageNames `json:"teamAbbrev"`
-	DrawnBy           string        `json:"drawnBy"`
-	DescKey           string        `json:"descKey"`
+	TimeInPeriod      string             `json:"timeInPeriod"`
+	Type              string             `json:"type"`
+	Duration          int                `json:"duration"`
+	CommittedByPlayer *PenaltyPlayerInfo `json:"committedByPlayer,omitempty"`
+	TeamAbbrev        LanguageNames      `json:"teamAbbrev"`
+	DrawnBy           *PenaltyPlayerInfo `json:"drawnBy,omitempty"`
+	DescKey           string             `json:"descKey"`
 }
 
 // StarPlayer represents a player selected as one of the three stars
