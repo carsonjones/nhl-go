@@ -128,13 +128,33 @@ func main() {
 	mux.Handle("/sse", sseServer)
 	mux.Handle("/message", sseServer)
 
+	// Also support /mcp as SSE endpoint (rewrite path)
+	mux.HandleFunc("/mcp", func(w http.ResponseWriter, r *http.Request) {
+		r.URL.Path = "/sse"
+		sseServer.ServeHTTP(w, r)
+	})
+
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("ok"))
 	})
 
+	// CORS middleware
+	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept")
+		
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		
+		mux.ServeHTTP(w, r)
+	})
+
 	log.Printf("NHL MCP SSE server listening on %s", addr)
 	log.Printf("SSE endpoint: %s/sse", baseURL)
 	log.Printf("Message endpoint: %s/message", baseURL)
-	log.Fatal(http.ListenAndServe(addr, mux))
+	log.Fatal(http.ListenAndServe(addr, corsHandler))
 }
