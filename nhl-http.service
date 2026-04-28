@@ -1,0 +1,16 @@
+[Unit]
+Description=NHL MCP HTTP Bridge
+After=network.target
+
+[Service]
+Type=simple
+User=exedev
+WorkingDirectory=/home/exedev/src/nhl-go
+Environment=MCP_PATH=/home/exedev/src/nhl-go/nhl-mcp
+Environment=ADDR=:8090
+ExecStart=/home/exedev/src/nhl-go/nhl-http
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
