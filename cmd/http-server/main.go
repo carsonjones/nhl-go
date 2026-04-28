@@ -104,6 +104,14 @@ func main() {
 		mcp.WithDescription("Get list of all NHL teams"),
 	)
 
+	highlightsTool := mcp.NewTool("nhl-highlights",
+		mcp.WithDescription("Get video highlights for a specific game"),
+		mcp.WithNumber("gameId",
+			mcp.Required(),
+			mcp.Description("Game ID"),
+		),
+	)
+
 	s.AddTool(slateTool, nhlserver.SlateHandler)
 	s.AddTool(playerTool, nhlserver.PlayerHandler)
 	s.AddTool(standingsTool, nhlserver.StandingsHandler)
@@ -113,6 +121,7 @@ func main() {
 	s.AddTool(gameTool, nhlserver.GameHandler)
 	s.AddTool(liveTool, nhlserver.LiveHandler)
 	s.AddTool(teamsTool, nhlserver.TeamsHandler)
+	s.AddTool(highlightsTool, nhlserver.HighlightsHandler)
 
 	// Create Streamable HTTP server (newer MCP transport)
 	httpServer := server.NewStreamableHTTPServer(s,

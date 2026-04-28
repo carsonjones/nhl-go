@@ -345,4 +345,34 @@ var (
 		}
 		return mcp.NewToolResultText(string(jsonData)), nil
 	}
+
+	HighlightsHandler server.ToolHandlerFunc = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		client := nhl.NewClient()
+
+		gameIDArg, ok := request.GetArguments()["gameId"]
+		if !ok || gameIDArg == nil {
+			return nil, fmt.Errorf("gameId parameter is required")
+		}
+
+		var gameID int
+		switch v := gameIDArg.(type) {
+		case float64:
+			gameID = int(v)
+		case int:
+			gameID = v
+		default:
+			return nil, fmt.Errorf("gameId must be a number")
+		}
+
+		result, err := client.GetGameHighlights(gameID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting highlights: %v", err)
+		}
+
+		jsonData, err := json.MarshalIndent(result, "", "  ")
+		if err != nil {
+			return nil, fmt.Errorf("error marshaling response: %v", err)
+		}
+		return mcp.NewToolResultText(string(jsonData)), nil
+	}
 )
