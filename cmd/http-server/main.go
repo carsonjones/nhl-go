@@ -1,188 +1,140 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"sync"
+
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
+
+	nhlserver "go-nhl/mcp/server"
 )
 
-type MCPBridge struct {
-	cmd    *exec.Cmd
-	stdin  io.WriteCloser
-	stdout *bufio.Reader
-	mu     sync.Mutex
-}
-
-func NewMCPBridge(mcpPath string) (*MCPBridge, error) {
-	cmd := exec.Command(mcpPath)
-	cmd.Stderr = os.Stderr
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get stdin pipe: %w", err)
-	}
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get stdout pipe: %w", err)
-	}
-
-	if err := cmd.Start(); err != nil {
-		return nil, fmt.Errorf("failed to start MCP: %w", err)
-	}
-
-	return &MCPBridge{
-		cmd:    cmd,
-		stdin:  stdin,
-		stdout: bufio.NewReader(stdout),
-	}, nil
-}
-
-func (b *MCPBridge) Call(request []byte) ([]byte, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	// Write request
-	if _, err := b.stdin.Write(append(request, '\n')); err != nil {
-		return nil, fmt.Errorf("failed to write to MCP: %w", err)
-	}
-
-	// Read response
-	line, err := b.stdout.ReadBytes('\n')
-	if err != nil {
-		return nil, fmt.Errorf("failed to read from MCP: %w", err)
-	}
-
-	return line, nil
-}
-
-func (b *MCPBridge) Close() error {
-	b.stdin.Close()
-	return b.cmd.Wait()
-}
-
 func main() {
-	mcpPath := os.Getenv("MCP_PATH")
-	if mcpPath == "" {
-		mcpPath = "/home/exedev/src/nhl-go/nhl-mcp"
-	}
-
 	addr := os.Getenv("ADDR")
 	if addr == "" {
 		addr = ":8090"
 	}
 
-	bridge, err := NewMCPBridge(mcpPath)
-	if err != nil {
-		log.Fatalf("failed to start MCP bridge: %v", err)
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost" + addr
 	}
-	defer bridge.Close()
 
-	// Initialize MCP
-	initReq := `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"http-bridge","version":"1.0"}}}`
-	if _, err := bridge.Call([]byte(initReq)); err != nil {
-		log.Fatalf("failed to initialize MCP: %v", err)
-	}
-	log.Println("MCP initialized")
+	// Create the MCP server
+	s := server.NewMCPServer(
+		"NHL",
+		"1.0.0",
+		server.WithResourceCapabilities(true, true),
+		server.WithLogging(),
+	)
 
-	http.HandleFunc("/tools", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+	// Register all the NHL tools
+	slateTool := mcp.NewTool("nhl-slate",
+		mcp.WithDescription("Get slate of games for a given date"),
+		mcp.WithString("date",
+			mcp.Required(),
+			mcp.Description("Date (YYYY-MM-DD format)"),
+		),
+	)
 
-		req := `{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}`
-		resp, err := bridge.Call([]byte(req))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Write(resp)
-	})
+	playerTool := mcp.NewTool("nhl-player",
+		mcp.WithDescription("Get player info and stats"),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Player name"),
+		),
+	)
 
-	http.HandleFunc("/call/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+	standingsTool := mcp.NewTool("nhl-standings",
+		mcp.WithDescription("Get standings"),
+		mcp.WithString("date",
+			mcp.Description("Date (YYYY-MM-DD format)"),
+		),
+		mcp.WithString("type",
+			mcp.Description("Standings type (conference, division, league)"),
+			mcp.DefaultString("league"),
+		),
+	)
 
-		if r.Method == "OPTIONS" {
-			w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-			return
-		}
+	rosterTool := mcp.NewTool("nhl-roster",
+		mcp.WithDescription("Get team roster"),
+		mcp.WithString("team",
+			mcp.Required(),
+			mcp.Description("Team abbreviation"),
+		),
+	)
 
-		toolName := r.URL.Path[len("/call/"):]
-		if toolName == "" {
-			http.Error(w, "tool name required", http.StatusBadRequest)
-			return
-		}
+	scheduleTool := mcp.NewTool("nhl-schedule",
+		mcp.WithDescription("Get team schedule"),
+		mcp.WithString("team",
+			mcp.Required(),
+			mcp.Description("Team abbreviation"),
+		),
+		mcp.WithNumber("seasonID",
+			mcp.Description("Season ID (example: 20242025)"),
+		),
+	)
 
-		var args map[string]interface{}
-		if r.Method == "POST" && r.Body != nil {
-			if err := json.NewDecoder(r.Body).Decode(&args); err != nil && err != io.EOF {
-				http.Error(w, fmt.Sprintf("invalid JSON: %v", err), http.StatusBadRequest)
-				return
-			}
-		}
-		if args == nil {
-			args = make(map[string]interface{})
-		}
+	leadersTool := mcp.NewTool("nhl-leaders",
+		mcp.WithDescription("Get leaders"),
+		mcp.WithString("seasonID",
+			mcp.Description("Season ID (example: 20242025)"),
+		),
+	)
 
-		// Parse query params as fallback
-		for k, v := range r.URL.Query() {
-			if len(v) > 0 && args[k] == nil {
-				args[k] = v[0]
-			}
-		}
+	gameTool := mcp.NewTool("nhl-game",
+		mcp.WithDescription("Get detailed game information including boxscore, play-by-play, and game story"),
+		mcp.WithNumber("gameId",
+			mcp.Required(),
+			mcp.Description("Game ID"),
+		),
+		mcp.WithString("include",
+			mcp.Description("What to include: details, boxscore, plays, story, or all (default: details)"),
+			mcp.DefaultString("details"),
+		),
+	)
 
-		req := map[string]interface{}{
-			"jsonrpc": "2.0",
-			"id":      3,
-			"method":  "tools/call",
-			"params": map[string]interface{}{
-				"name":      toolName,
-				"arguments": args,
-			},
-		}
+	liveTool := mcp.NewTool("nhl-live",
+		mcp.WithDescription("Get live game updates and current scoreboard"),
+	)
 
-		reqBytes, _ := json.Marshal(req)
-		resp, err := bridge.Call(reqBytes)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+	teamsTool := mcp.NewTool("nhl-teams",
+		mcp.WithDescription("Get list of all NHL teams"),
+	)
 
-		// Parse and extract just the result content
-		var jsonResp struct {
-			Result struct {
-				Content []struct {
-					Text string `json:"text"`
-				} `json:"content"`
-			} `json:"result"`
-			Error *struct {
-				Message string `json:"message"`
-			} `json:"error"`
-		}
-		if err := json.Unmarshal(resp, &jsonResp); err == nil {
-			if jsonResp.Error != nil {
-				http.Error(w, jsonResp.Error.Message, http.StatusBadRequest)
-				return
-			}
-			if len(jsonResp.Result.Content) > 0 {
-				w.Write([]byte(jsonResp.Result.Content[0].Text))
-				return
-			}
-		}
-		w.Write(resp)
-	})
+	s.AddTool(slateTool, nhlserver.SlateHandler)
+	s.AddTool(playerTool, nhlserver.PlayerHandler)
+	s.AddTool(standingsTool, nhlserver.StandingsHandler)
+	s.AddTool(rosterTool, nhlserver.RosterHandler)
+	s.AddTool(scheduleTool, nhlserver.ScheduleHandler)
+	s.AddTool(leadersTool, nhlserver.LeadersHandler)
+	s.AddTool(gameTool, nhlserver.GameHandler)
+	s.AddTool(liveTool, nhlserver.LiveHandler)
+	s.AddTool(teamsTool, nhlserver.TeamsHandler)
 
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	// Create SSE server
+	sseServer := server.NewSSEServer(s,
+		server.WithBaseURL(baseURL),
+		server.WithSSEEndpoint("/sse"),
+		server.WithMessageEndpoint("/message"),
+	)
+
+	// Create mux for multiple endpoints
+	mux := http.NewServeMux()
+
+	// SSE endpoints
+	mux.Handle("/sse", sseServer)
+	mux.Handle("/message", sseServer)
+
+	// Health check
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("ok"))
 	})
 
-	log.Printf("HTTP-MCP bridge listening on %s", addr)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	log.Printf("NHL MCP SSE server listening on %s", addr)
+	log.Printf("SSE endpoint: %s/sse", baseURL)
+	log.Printf("Message endpoint: %s/message", baseURL)
+	log.Fatal(http.ListenAndServe(addr, mux))
 }

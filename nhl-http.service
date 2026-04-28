@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=exedev
 WorkingDirectory=/home/exedev/src/nhl-go
-Environment=MCP_PATH=/home/exedev/src/nhl-go/nhl-mcp
+Environment=BASE_URL=https://mcp.knowpuck.com
 Environment=ADDR=:8090
 ExecStart=/home/exedev/src/nhl-go/nhl-http
 Restart=always
